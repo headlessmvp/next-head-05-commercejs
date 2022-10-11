@@ -25,9 +25,9 @@ export const Category = () => {
                 </div>
 
                 <div className="mt-6 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:grid-rows-2 sm:gap-x-6 lg:gap-8">
-                    {allData?.categories && allData?.categories[0] && <Link href={`/category/${allData?.categories[0]?.label}`}><div className="group aspect-w-2 aspect-h-1 overflow-hidden rounded-lg sm:aspect-h-1 sm:aspect-w-1 sm:row-span-2">
+                    {allData?.categories && allData?.categories[0] && <Link href={`/category/${allData?.categories[0]?.slug}`}><div className="group aspect-w-2 aspect-h-1 overflow-hidden rounded-lg sm:aspect-h-1 sm:aspect-w-1 sm:row-span-2">
                         <img
-                            src={allData?.categories[0]?.image?.url}
+                            src={allData?.categories[0]?.assets[0]?.url}
                             alt={allData?.categories[0]?.name}
                             className="object-cover object-center group-hover:opacity-75"
                         />
@@ -47,9 +47,9 @@ export const Category = () => {
                         </div>
                     </div></Link>}
 
-                    {allData?.categories && allData?.categories[1] && <Link href={`/category/${allData?.categories[1]?.label}`}><div className="group aspect-w-2 aspect-h-1 overflow-hidden rounded-lg sm:aspect-none sm:relative sm:h-full">
+                    {allData?.categories && allData?.categories[1] && <Link href={`/category/${allData?.categories[1]?.slug}`}><div className="group aspect-w-2 aspect-h-1 overflow-hidden rounded-lg sm:aspect-none sm:relative sm:h-full">
                         <img
-                            src={allData?.categories[1]?.image?.url}
+                            src={allData?.categories[1]?.assets[1]?.url}
                             alt={allData?.categories[1]?.name}
                             className="object-cover object-center group-hover:opacity-75 sm:absolute sm:inset-0 sm:h-full sm:w-full"
                         />
@@ -73,9 +73,9 @@ export const Category = () => {
                     </div></Link>}
 
 
-                    {allData?.categories && allData?.categories[2] && <Link href={`/category/${allData?.categories[2]?.label}`}><div className="group aspect-w-2 aspect-h-1 overflow-hidden rounded-lg sm:aspect-none sm:relative sm:h-full">
+                    {allData?.categories && allData?.categories[2] && <Link href={`/category/${allData?.categories[2]?.slug}`}><div className="group aspect-w-2 aspect-h-1 overflow-hidden rounded-lg sm:aspect-none sm:relative sm:h-full">
                         <img
-                            src={allData?.categories[2]?.image?.url}
+                            src={allData?.categories[2]?.assets[2]?.url}
                             alt={allData?.categories[2]?.name}
                             className="object-cover object-center group-hover:opacity-75 sm:absolute sm:inset-0 sm:h-full sm:w-full"
                         />

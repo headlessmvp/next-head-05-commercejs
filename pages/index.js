@@ -44,6 +44,8 @@ export default function Home({ data, sanity }) {
         {/* Hero section */}
         <Hero />
       </div>{" "}
+      {/* Category section */}
+      <Category />
       {/* <h1 className="text-xl mb-4 font-bold">{merchant.business_name}</h1>
 
       <h3 className="text-lg mb-2 font-semibold underline">
