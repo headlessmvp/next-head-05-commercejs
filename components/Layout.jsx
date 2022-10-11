@@ -283,14 +283,14 @@ export const Layout = ({ children }) => {
                                                                     className="space-y-10 px-4 pt-10 pb-8"
                                                                 >
                                                                     <div className="grid grid-cols-2 gap-x-4">
-                                                                        {category.subCategories.map((item) => (
+                                                                        {category?.children?.map((item) => (
                                                                             <div
-                                                                                key={item.name}
+                                                                                key={item.id}
                                                                                 className="group relative text-sm"
                                                                             >
                                                                                 <div className="aspect-w-1 aspect-h-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
                                                                                     <img
-                                                                                        src={item?.image?.url}
+                                                                                        src={item?.assets[0]?.url}
                                                                                         alt={item?.name}
                                                                                         className="object-cover object-center"
                                                                                     />
@@ -450,15 +450,15 @@ export const Layout = ({ children }) => {
                                                                                     <div className="mx-auto max-w-7xl px-8">
                                                                                         <div className="grid grid-cols-2 gap-y-10 gap-x-8 py-16">
                                                                                             <div className="col-start-2 grid grid-cols-2 gap-x-8">
-                                                                                                {category?.subCategories?.map(
+                                                                                                {category?.children?.map(
                                                                                                     (item) => (
                                                                                                         <div
-                                                                                                            key={item?.name}
+                                                                                                            key={item?.id}
                                                                                                             className="group relative text-base sm:text-sm"
                                                                                                         >
                                                                                                             <div className="aspect-w-1 aspect-h-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
                                                                                                                 <img
-                                                                                                                    src={item?.image?.url}
+                                                                                                                    src={item?.assets[0]?.url}
                                                                                                                     alt={item?.name}
                                                                                                                     className="object-cover object-center"
                                                                                                                 />
@@ -485,38 +485,57 @@ export const Layout = ({ children }) => {
                                                                                                 )}
                                                                                             </div>
                                                                                             <div className="row-start-1 grid grid-cols-3 gap-y-10 gap-x-8 text-sm">
-                                                                                                {category?.subCategories?.map(
-                                                                                                    (subCategory) => (
-                                                                                                        <div key={subCategory?.slug}>
-                                                                                                            <p
-                                                                                                                id={`${subCategory.slug}-heading`}
-                                                                                                                className="font-medium text-gray-900"
-                                                                                                            >
-                                                                                                                {subCategory?.label}
-                                                                                                            </p>
-                                                                                                            <ul
-                                                                                                                role="list"
-                                                                                                                aria-labelledby={`${subCategory?.slug}-heading`}
-                                                                                                                className="mt-6 space-y-6 sm:mt-4 sm:space-y-4"
-                                                                                                            >
-                                                                                                                {subCategory?.products.map(
-                                                                                                                    (item) => (
-                                                                                                                        <li
-                                                                                                                            key={item?.name}
-                                                                                                                            className="flex"
-                                                                                                                        >
-                                                                                                                            <a
-                                                                                                                                href={item?.reference}
-                                                                                                                                className="hover:text-gray-800"
+                                                                                                {category?.children?.map(
+                                                                                                    (subCategory) => {
+                                                                                                        let products = []
+                                                                                                        console.log("SUB CAT: ", subCategory)
+                                                                                                        console.log("PRODUCTS: ", allData?.products)
+
+                                                                                                        let filtered
+                                                                                                        allData?.products?.map((prod) => {
+                                                                                                            console.log("MAPPING: ", prod)
+                                                                                                            filtered = prod?.categories?.filter(subCat => subCat?.id === subCategory?.id)
+                                                                                                            console.log("FILTERRR: ", filtered)
+                                                                                                            if (filtered[0]) {
+                                                                                                                products.push(prod)
+                                                                                                            }
+                                                                                                        })
+                                                                                                        console.log("FILTERED: ", filtered)
+                                                                                                        if (products?.length === 0) return null
+                                                                                                        console.log("PRODS TO SHOW: ", products)
+
+                                                                                                        return (
+                                                                                                            <div key={subCategory?.id}>
+                                                                                                                <p
+                                                                                                                    id={`${subCategory.id}-heading`}
+                                                                                                                    className="font-medium text-gray-900"
+                                                                                                                >
+                                                                                                                    {subCategory?.name}
+                                                                                                                </p>
+                                                                                                                <ul
+                                                                                                                    role="list"
+                                                                                                                    aria-labelledby={`${subCategory?.id}-heading`}
+                                                                                                                    className="mt-6 space-y-6 sm:mt-4 sm:space-y-4"
+                                                                                                                >
+                                                                                                                    {products.map(
+                                                                                                                        (item) => (
+                                                                                                                            <li
+                                                                                                                                key={item?.name}
+                                                                                                                                className="flex"
                                                                                                                             >
-                                                                                                                                {item?.name}
-                                                                                                                            </a>
-                                                                                                                        </li>
-                                                                                                                    )
-                                                                                                                )}
-                                                                                                            </ul>
-                                                                                                        </div>
-                                                                                                    )
+                                                                                                                                <a
+                                                                                                                                    href={item?.reference}
+                                                                                                                                    className="hover:text-gray-800"
+                                                                                                                                >
+                                                                                                                                    {item?.name}
+                                                                                                                                </a>
+                                                                                                                            </li>
+                                                                                                                        )
+                                                                                                                    )}
+                                                                                                                </ul>
+                                                                                                            </div>
+                                                                                                        )
+                                                                                                    }
                                                                                                 )}
                                                                                             </div>
                                                                                         </div>
