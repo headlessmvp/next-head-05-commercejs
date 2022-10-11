@@ -4,6 +4,9 @@ import { useContext, useEffect } from "react"
 import { ProductContext } from "../context/ProductContext"
 
 // Sanity
+import { client } from "../lib/client"
+
+// Commerce Js
 import commerce from "../lib/commerce"
 
 // Components
@@ -17,11 +20,13 @@ import ProductList from "../components/ProductList"
 import Link from "next/link"
 import CategoryList from "../components/CategoryList"
 
-export default function Home({ data }) {
-  const { setAllData, allData, setSubCategories } = useContext(ProductContext)
+export default function Home({ data, sanity }) {
+  const { setAllData, allData, setSubCategories, setSanityData, sanityData } =
+    useContext(ProductContext)
 
   useEffect(() => {
     setAllData(data)
+    setSanityData(sanity)
   }, [])
 
   useEffect(() => {
@@ -32,10 +37,13 @@ export default function Home({ data }) {
     // setSubCategories(subCatTemp)
   }, [allData])
 
-  console.log("PRODUCTS: ", data)
+  console.log("PRODUCTS: ", data, sanityData)
   return (
     <Layout>
-      <h2>Hello</h2>
+      <div className="relative overflow-hidden">
+        {/* Hero section */}
+        <Hero />
+      </div>{" "}
       {/* <h1 className="text-xl mb-4 font-bold">{merchant.business_name}</h1>
 
       <h3 className="text-lg mb-2 font-semibold underline">
@@ -63,9 +71,48 @@ export async function getStaticProps() {
   const { data: products } = await commerce.products.list()
   let data = { merchant, categories, products }
 
+  const query = `*[_type == "head"]{
+    id,
+    name,
+    country,
+    flag{
+      'url': asset->url
+    },
+    headline,
+    subHeading,
+    'images': images[]->{
+      name,
+      'url': images.asset->url
+    },
+    url,
+    bannerHeading,
+    bannerText,
+    saleText,
+    bannerImage{
+      'url': asset->url
+    },
+    
+    
+   
+    
+   
+}`
+
+  // Get Sanity Data
+  const heads = await client.fetch(query)
+
+  let filtered = {}
+
+  if (heads.length > 0) {
+    filtered = heads.filter(
+      (head) => head.id === process.env.NEXT_PUBLIC_HEAD_ID
+    )
+  }
+
   return {
     props: {
       data,
+      sanity: filtered[0],
     },
   }
 }

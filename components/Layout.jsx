@@ -175,6 +175,7 @@ export const Layout = ({ children }) => {
     const {
         token,
         allData,
+        sanityData
     } = useContext(ProductContext)
     const [open, setOpen] = useState(false)
 
@@ -588,16 +589,16 @@ export const Layout = ({ children }) => {
                                                             href="#"
                                                             className="flex items-center text-gray-700 hover:text-gray-800"
                                                         >
-                                                            {allData?.flag && allData?.flag?.url && (
+                                                            {sanityData?.flag && sanityData?.flag?.url && (
                                                                 <img
-                                                                    src={allData?.flag?.url}
+                                                                    src={sanityData?.flag?.url}
                                                                     alt="country"
                                                                     className="block h-auto w-5 flex-shrink-0"
                                                                 />
                                                             )}
 
                                                             <span className="ml-3 block text-sm font-medium">
-                                                                {allData?.country}
+                                                                {sanityData?.country}
                                                             </span>
                                                             <span className="sr-only">, change currency</span>
                                                         </a>

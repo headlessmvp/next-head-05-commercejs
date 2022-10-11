@@ -9,6 +9,8 @@ export const ProductProvider = ({ children }) => {
   const [products, setProducts] = useState([])
   const [subCategories, setSubCategories] = useState([])
   const [allData, setAllData] = useState([])
+  const [sanityData, setSanityData] = useState([])
+
   const [cart, setCart] = useState([])
   const [token, setToken] = useState("")
   const [auth, setAuth] = useState(null)
@@ -82,6 +84,8 @@ export const ProductProvider = ({ children }) => {
         subCategories,
         setSubCategories,
         compareSizes,
+        sanityData,
+        setSanityData,
       }}
     >
       {children}
