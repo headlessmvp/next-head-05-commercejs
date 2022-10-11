@@ -77,7 +77,7 @@ export default function Home({ data, sanity }) {
   )
 }
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
   const merchant = await commerce.merchants.about()
   const { data: categories } = await commerce.categories.list()
   const { data: products } = await commerce.products.list()

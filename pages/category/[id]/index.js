@@ -3,6 +3,9 @@ import { Fragment, useState, useContext, useEffect } from "react"
 // Headless UI
 import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react"
 
+// Commerce Js
+import commerce from "../../../lib/commerce"
+
 // Heroicons
 import { XMarkIcon } from "@heroicons/react/24/outline"
 import {
@@ -26,27 +29,29 @@ import { Layout } from "../../../components/Layout"
 // Context
 import { ProductContext } from "../../../context/ProductContext"
 
-export default function Category({ data }) {
+export default function Category({ data, sanity }) {
   const router = useRouter()
 
-  const { setAllData, allData } = useContext(ProductContext)
+  const { setAllData, allData, setSubCategories, setSanityData, sanityData } =
+    useContext(ProductContext)
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const [categoryData, setCategoryData] = useState({})
 
   useEffect(() => {
     setAllData(data)
+    setSanityData(sanity)
   }, [])
 
   useEffect(() => {
-    if (allData?.id) {
+    if (allData?.categories) {
       let filtered = allData?.categories?.filter(
-        (item) => item.label === router.query.id
+        (item) => item.slug === router.query.id
       )
       setCategoryData(...filtered)
     }
   }, [allData])
 
-  console.log("CATEGORY: ", categoryData)
+  console.log("CATEGORY: ", allData, categoryData)
   return (
     <Layout>
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -83,7 +88,7 @@ export default function Category({ data }) {
             {/* Product grid */}
             <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 md:grid-cols-3 lg:col-span-4 lg:gap-x-8">
               {categoryData &&
-                categoryData?.subCategories?.map((subCategory) => (
+                categoryData?.children?.map((subCategory) => (
                   <Link
                     key={subCategory.slug}
                     href={`${categoryData?.slug}/${subCategory?.slug}`}
@@ -91,13 +96,13 @@ export default function Category({ data }) {
                     <div className="group text-sm cursor-pointer">
                       <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
                         <img
-                          src={subCategory?.image?.url}
+                          src={subCategory?.assets[0]?.url}
                           alt={subCategory?.name}
                           className="h-full w-full object-cover object-center"
                         />
                       </div>
                       <h3 className="mt-4 font-medium text-gray-900">
-                        {subCategory?.label}
+                        {subCategory?.name}
                       </h3>
                       <p className="italic text-gray-500">
                         {" "}
@@ -115,6 +120,11 @@ export default function Category({ data }) {
 }
 
 export async function getServerSideProps() {
+  const merchant = await commerce.merchants.about()
+  const { data: categories } = await commerce.categories.list()
+  const { data: products } = await commerce.products.list()
+  let data = { merchant, categories, products }
+
   const query = `*[_type == "head"]{
     id,
     name,
@@ -135,51 +145,11 @@ export async function getServerSideProps() {
     bannerImage{
       'url': asset->url
     },
-    'categories': categories[]->{
-      name,
-      label,
-      slug,
-      description,
-      image{
-        'url': asset->url
-      },
-    'subCategories': subCategories[]->{
-      name,
-      label,
-      slug,
-      description,
-      image{
-        'url': asset->url
-      },
-      'products': products[]->{
-        name,
-        description,
-        caption,
-        reference,
-        'colors': colors[]->{
-          name,
-          code,
-        },         
-        'sizes': sizes[]->{
-          name,
-        },
-        'images': images[]->{
-          name,
-          description,
-          'url': images.asset->url
-      }
-    }}},   
-    'favourites':favourites[]->{
-      name,
-        description,
-        caption,
-        reference,
-        'images': images[]->{
-          name,
-          description,
-          'url': images.asset->url
-      }
-    }
+    
+    
+   
+    
+   
 }`
 
   // Get Sanity Data
@@ -195,7 +165,8 @@ export async function getServerSideProps() {
 
   return {
     props: {
-      data: filtered[0],
+      data,
+      sanity: filtered[0],
     },
   }
 }
