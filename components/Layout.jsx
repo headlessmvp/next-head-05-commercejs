@@ -489,21 +489,21 @@ export const Layout = ({ children }) => {
                                                                                                 {category?.children?.map(
                                                                                                     (subCategory) => {
                                                                                                         let products = []
-                                                                                                        console.log("SUB CAT: ", subCategory)
-                                                                                                        console.log("PRODUCTS: ", allData?.products)
+                                                                                                        // console.log("SUB CAT: ", subCategory)
+                                                                                                        // console.log("PRODUCTS: ", allData?.products)
 
                                                                                                         let filtered
                                                                                                         allData?.products?.map((prod) => {
-                                                                                                            console.log("MAPPING: ", prod)
+                                                                                                            // console.log("MAPPING: ", prod)
                                                                                                             filtered = prod?.categories?.filter(subCat => subCat?.id === subCategory?.id)
-                                                                                                            console.log("FILTERRR: ", filtered)
+                                                                                                            // console.log("FILTERRR: ", filtered)
                                                                                                             if (filtered[0]) {
                                                                                                                 products.push(prod)
                                                                                                             }
                                                                                                         })
-                                                                                                        console.log("FILTERED: ", filtered)
+                                                                                                        // console.log("FILTERED: ", filtered)
                                                                                                         if (products?.length === 0) return null
-                                                                                                        console.log("PRODS TO SHOW: ", products)
+                                                                                                        // console.log("PRODS TO SHOW: ", products)
 
                                                                                                         return (
                                                                                                             <div key={subCategory?.id}>

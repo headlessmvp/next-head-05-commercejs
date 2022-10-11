@@ -37,7 +37,7 @@ export default function Home({ data, sanity }) {
     // setSubCategories(subCatTemp)
   }, [allData])
 
-  console.log("PRODUCTS: ", data, sanityData)
+  // console.log("PRODUCTS: ", data, sanityData)
   return (
     <Layout>
       <div className="relative overflow-hidden">

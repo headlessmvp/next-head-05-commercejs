@@ -13,6 +13,9 @@ import Image from "next/image"
 // Sanity Client
 import { client } from "../../lib/client"
 
+// Commerce Js
+import commerce from "../../lib/commerce"
+
 // Utils
 import { mapImageResources } from "../../lib/cloudinary"
 import { cloudinaryUrl } from "../../utils"
@@ -60,7 +63,16 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
 
-export default function Example({ data, sizes }) {
+export default function Example({ data, sanity }) {
+  const {
+    setAllData,
+    allData,
+    setSubCategories,
+    setSanityData,
+    subCategories,
+    sanityData,
+  } = useContext(ProductContext)
+
   const [selectedColor, setSelectedColor] = useState()
   const [selectedSize, setSelectedSize] = useState()
   const [productDetails, setProductDetails] = useState({})
@@ -70,44 +82,46 @@ export default function Example({ data, sizes }) {
   const router = useRouter()
 
   useEffect(() => {
-    data.categories.map((category) => {
-      category?.subCategories.map((subCategory) => {
-        if (subCategory.name.search("all") !== -1) {
-          const filtered = subCategory.products.filter(
-            (product) => product.reference === router.query.id
-          )
-          if (filtered[0]?.reference) {
-            setProductDetails(filtered[0])
-          }
-        }
-      })
-    })
+    setAllData(data)
+    setSanityData(sanity)
   }, [])
 
   useEffect(() => {
-    if (productDetails?.sizes) {
-      let tempShowSizes = []
-      sizes?.map((size) => {
-        let filtered = productDetails?.sizes?.filter(
-          (item) => item.name === size.name
-        )
-        if (filtered[0]) {
-          tempShowSizes.push({ name: size.name, inStock: true })
-        } else {
-          tempShowSizes.push({ name: size.name, inStock: false })
-        }
-      })
-      setShowSizes(tempShowSizes)
+    let filtered = data?.products?.filter(
+      (product) => product?.sku === router.query.id
+    )
+    console.log("FILTERED: ", filtered)
+    if (filtered?.length > 0) {
+      setProductDetails(...filtered)
     }
-  }, [productDetails])
+  }, [])
+
+  console.log("DATA: ", productDetails)
+
+  // useEffect(() => {
+  //   if (productDetails?.sizes) {
+  //     let tempShowSizes = []
+  //     sizes?.map((size) => {
+  //       let filtered = productDetails?.sizes?.filter(
+  //         (item) => item.name === size.name
+  //       )
+  //       if (filtered[0]) {
+  //         tempShowSizes.push({ name: size.name, inStock: true })
+  //       } else {
+  //         tempShowSizes.push({ name: size.name, inStock: false })
+  //       }
+  //     })
+  //     setShowSizes(tempShowSizes)
+  //   }
+  // }, [productDetails])
 
   useEffect(() => {
-    if (productDetails?.reference) {
+    if (productDetails?.sku) {
       ;(async function run() {
         const results = await fetch("/api/search", {
           method: "POST",
           body: JSON.stringify({
-            expression: `context.reference:${productDetails?.reference}`,
+            expression: `context.reference:${productDetails?.sku}`,
             with_field: "context",
             max_results: 4,
           }),
@@ -127,15 +141,12 @@ export default function Example({ data, sizes }) {
             <div className="lg:col-span-5 lg:col-start-8">
               <div className="flex justify-between">
                 <h1 className="text-xl font-medium text-gray-900">
-                  {productDetails.name}
+                  {productDetails?.name}
                 </h1>
-                <PricesContainer>
-                  <Price
-                    skuCode={productDetails.reference}
-                    className="text-xl font-medium text-gray-900"
-                    compareClassName="line-through text-sm md:text-xs ml-2 mb-1"
-                  />
-                </PricesContainer>
+                <p className="text-xl font-medium text-gray-900">
+                  {" "}
+                  {productDetails?.price?.formatted_with_symbol}
+                </p>
               </div>
             </div>
 
@@ -297,7 +308,7 @@ export default function Example({ data, sizes }) {
               </div>
 
               {/* Highlights */}
-              <div className="mt-8 border-t border-gray-200 pt-8">
+              {/* <div className="mt-8 border-t border-gray-200 pt-8">
                 <h2 className="text-sm font-medium text-gray-900">
                   Highlights
                 </h2>
@@ -309,7 +320,7 @@ export default function Example({ data, sizes }) {
                     ))}
                   </ul>
                 </div>
-              </div>
+              </div> */}
 
               {/* Policies */}
               <section aria-labelledby="policies-heading" className="mt-10">
@@ -391,51 +402,39 @@ export default function Example({ data, sizes }) {
 }
 
 export async function getServerSideProps() {
+  const merchant = await commerce.merchants.about()
+  const { data: categories } = await commerce.categories.list()
+  const { data: products } = await commerce.products.list()
+  let data = { merchant, categories, products }
+
   const query = `*[_type == "head"]{
     id,
     name,
+    country,
+    flag{
+      'url': asset->url
+    },
+    headline,
+    subHeading,
+    'images': images[]->{
+      name,
+      'url': images.asset->url
+    },
     url,
-    'categories': categories[]->{
-      name,
-      label,
-      slug,
-      description,
-    'subCategories': subCategories[]->{
-      name,
-      label,
-      slug,
-      description,
-      'products': products[]->{
-        name,
-        description,
-        details,
-        highlights,
-        'sizes': sizes[]->{
-          name,
-        },
-        caption,
-        price,
-        currency,
-        reference,
-        'colors': colors[]->{
-          name,
-          code,
-        },
-        'images': images[]->{
-          name,
-          description,
-          'url': images.asset->url
-      }
-    }}
-  }
+    bannerHeading,
+    bannerText,
+    saleText,
+    bannerImage{
+      'url': asset->url
+    },
+    
+    
+   
+    
+   
 }`
 
-  const sizesQuery = `*[_type == "size"]{
-  name,
-}`
-
-  const sizes = await client.fetch(sizesQuery)
-
+  // Get Sanity Data
   const heads = await client.fetch(query)
 
   let filtered = {}
@@ -448,8 +447,8 @@ export async function getServerSideProps() {
 
   return {
     props: {
-      data: filtered[0],
-      sizes: sizes,
+      data,
+      sanity: filtered[0],
     },
   }
 }

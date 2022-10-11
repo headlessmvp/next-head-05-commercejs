@@ -3,9 +3,6 @@ import { Fragment, useState, useContext, useEffect } from "react"
 // Headless UI
 import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react"
 
-// Commerce Js
-import commerce from "../../../lib/commerce"
-
 // Heroicons
 import { XMarkIcon } from "@heroicons/react/24/outline"
 import {
@@ -22,6 +19,9 @@ import { useRouter } from "next/router"
 
 // Sanity Client
 import { client } from "../../../lib/client"
+
+// Commerce Js
+import commerce from "../../../lib/commerce"
 
 // Components
 import { Layout } from "../../../components/Layout"
@@ -51,7 +51,7 @@ export default function Category({ data, sanity }) {
     }
   }, [allData])
 
-  console.log("CATEGORY: ", allData, categoryData)
+  // console.log("CATEGORY: ", allData, categoryData)
   return (
     <Layout>
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

@@ -20,6 +20,9 @@ import { useRouter } from "next/router"
 // Sanity Client
 import { client } from "../../../../lib/client"
 
+// Commerce Js
+import commerce from "../../../../lib/commerce"
+
 // Components
 import { Layout } from "../../../../components/Layout"
 
@@ -38,11 +41,18 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
 
-export default function SubCategory({ data }) {
+export default function SubCategory({ data, sanity }) {
   const router = useRouter()
 
-  const { setAllData, setSubCategories, subCategories, allData } =
-    useContext(ProductContext)
+  const {
+    setAllData,
+    allData,
+    setSubCategories,
+    setSanityData,
+    subCategories,
+    sanityData,
+  } = useContext(ProductContext)
+
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const [subCategoryData, setSubCategoryData] = useState({})
   const [colors, setColors] = useState([])
@@ -54,13 +64,14 @@ export default function SubCategory({ data }) {
 
   useEffect(() => {
     setAllData(data)
+    setSanityData(sanity)
   }, [])
 
   useEffect(() => {
-    if (allData?.id) {
+    if (allData?.categories) {
       let subCatTemp = []
       data?.categories?.map((category) => {
-        category?.subCategories?.map((sub) => subCatTemp.push(sub))
+        category?.children?.map((sub) => subCatTemp.push(sub))
       })
       setSubCategories(subCatTemp)
     }
@@ -68,132 +79,154 @@ export default function SubCategory({ data }) {
 
   useEffect(() => {
     if (subCategories?.length) {
-      let filtered = subCategories?.filter(
+      let tempProducts = []
+
+      let filteredSubCat = subCategories?.filter(
         (item) => item.slug === router.query.slug
       )
-      setSubCategoryData(...filtered)
+
+      // console.log("SUB CAT: ", filteredSubCat)
+      // console.log("PRODUCTS: ", allData?.products)
+
+      let filtered
+
+      allData?.products?.map((prod) => {
+        console.log("MAPPING: ", prod, filteredSubCat)
+        filtered = prod?.categories?.filter(
+          (subCat) => subCat?.id === filteredSubCat[0]?.id
+        )
+        console.log("FILTERRR: ", filtered)
+        if (filtered[0]) {
+          tempProducts.push(prod)
+        }
+      })
+      // console.log("FILTERED: ", filtered)
+      console.log("TEMP PRODS: : ", tempProducts)
+      setProducts(tempProducts)
+      setSubCategoryData(...filteredSubCat)
     }
   }, [subCategories])
 
-  useEffect(() => {
-    if (subCategoryData?.name) {
-      setProducts(subCategoryData?.products)
-    }
-  }, [subCategoryData])
+  // useEffect(() => {
+  //   if (subCategoryData?.name) {
+  //     setProducts(subCategoryData?.products)
+  //   }
+  // }, [subCategoryData])
 
-  useEffect(() => {
-    let tempColors = []
-    if (subCategoryData?.name) {
-      subCategoryData?.products?.map((product) => {
-        tempColors.push(...product?.colors)
-      })
+  // useEffect(() => {
+  //   let tempColors = []
+  //   if (subCategoryData?.name) {
+  //     subCategoryData?.products?.map((product) => {
+  //       tempColors.push(...product?.colors)
+  //     })
 
-      const arrayUniqueByKey = [
-        ...new Map(tempColors.map((item) => [item["name"], item])).values(),
-      ]
+  //     const arrayUniqueByKey = [
+  //       ...new Map(tempColors.map((item) => [item["name"], item])).values(),
+  //     ]
 
-      let colorsWithCheck = []
-      arrayUniqueByKey?.map((item) =>
-        colorsWithCheck.push({ ...item, checked: false })
-      )
-      setColors(colorsWithCheck)
-    }
-  }, [subCategoryData])
+  //     let colorsWithCheck = []
+  //     arrayUniqueByKey?.map((item) =>
+  //       colorsWithCheck.push({ ...item, checked: false })
+  //     )
+  //     setColors(colorsWithCheck)
+  //   }
+  // }, [subCategoryData])
 
-  useEffect(() => {
-    let tempSizes = []
-    if (subCategoryData?.name) {
-      subCategoryData?.products?.map((product) => {
-        tempSizes.push(...product?.sizes)
-      })
+  // useEffect(() => {
+  //   let tempSizes = []
+  //   if (subCategoryData?.name) {
+  //     subCategoryData?.products?.map((product) => {
+  //       tempSizes.push(...product?.sizes)
+  //     })
 
-      const arrayUniqueByKey = [
-        ...new Map(tempSizes.map((item) => [item["name"], item])).values(),
-      ]
+  //     const arrayUniqueByKey = [
+  //       ...new Map(tempSizes.map((item) => [item["name"], item])).values(),
+  //     ]
 
-      let sizesWithCheck = []
-      arrayUniqueByKey?.map((item) =>
-        sizesWithCheck.push({ ...item, checked: false })
-      )
-      setSizes(sizesWithCheck)
-    }
-  }, [subCategoryData])
+  //     let sizesWithCheck = []
+  //     arrayUniqueByKey?.map((item) =>
+  //       sizesWithCheck.push({ ...item, checked: false })
+  //     )
+  //     setSizes(sizesWithCheck)
+  //   }
+  // }, [subCategoryData])
 
-  useEffect(() => {
-    if (selectedColors?.length > 0) {
-      let tempProducts = []
-      products?.map((product) => {
-        product?.colors?.map((color) => {
-          let filteredColor = selectedColors?.filter(
-            (item) => item.name === color?.name
-          )
-          // console.log("FILTERED: COLOR: ", filteredColor, product)
-          if (filteredColor[0]?.name) {
-            if (tempProducts?.length > 0) {
-              let filteredProduct = tempProducts?.filter(
-                (item) => item.name === product?.name
-              )
-              if (filteredProduct[0]?.name) {
-              } else {
-                tempProducts.push(product)
-              }
-            } else {
-              tempProducts.push(product)
-            }
-          }
-        })
-      })
+  // useEffect(() => {
+  //   if (selectedColors?.length > 0) {
+  //     let tempProducts = []
+  //     products?.map((product) => {
+  //       product?.colors?.map((color) => {
+  //         let filteredColor = selectedColors?.filter(
+  //           (item) => item.name === color?.name
+  //         )
+  //         // console.log("FILTERED: COLOR: ", filteredColor, product)
+  //         if (filteredColor[0]?.name) {
+  //           if (tempProducts?.length > 0) {
+  //             let filteredProduct = tempProducts?.filter(
+  //               (item) => item.name === product?.name
+  //             )
+  //             if (filteredProduct[0]?.name) {
+  //             } else {
+  //               tempProducts.push(product)
+  //             }
+  //           } else {
+  //             tempProducts.push(product)
+  //           }
+  //         }
+  //       })
+  //     })
 
-      setFilteredProducts(tempProducts)
-    } else {
-      setFilteredProducts(products)
-    }
-  }, [selectedColors])
+  //     setFilteredProducts(tempProducts)
+  //   } else {
+  //     setFilteredProducts(products)
+  //   }
+  // }, [selectedColors])
 
-  useEffect(() => {
-    if (selectedSizes?.length > 0) {
-      let tempProducts = []
-      products?.map((product) => {
-        product?.sizes?.map((size) => {
-          let filteredSize = selectedSizes?.filter(
-            (item) => item.name === size?.name
-          )
-          if (filteredSize[0]?.name) {
-            if (tempProducts?.length > 0) {
-              let filteredProduct = tempProducts?.filter(
-                (item) => item.name === product?.name
-              )
-              if (filteredProduct[0]?.name) {
-              } else {
-                tempProducts.push(product)
-              }
-            } else {
-              tempProducts.push(product)
-            }
-          }
-        })
-      })
+  // useEffect(() => {
+  //   if (selectedSizes?.length > 0) {
+  //     let tempProducts = []
+  //     products?.map((product) => {
+  //       product?.sizes?.map((size) => {
+  //         let filteredSize = selectedSizes?.filter(
+  //           (item) => item.name === size?.name
+  //         )
+  //         if (filteredSize[0]?.name) {
+  //           if (tempProducts?.length > 0) {
+  //             let filteredProduct = tempProducts?.filter(
+  //               (item) => item.name === product?.name
+  //             )
+  //             if (filteredProduct[0]?.name) {
+  //             } else {
+  //               tempProducts.push(product)
+  //             }
+  //           } else {
+  //             tempProducts.push(product)
+  //           }
+  //         }
+  //       })
+  //     })
 
-      setFilteredProducts(tempProducts)
-    } else {
-      setFilteredProducts(products)
-    }
-  }, [selectedSizes])
+  //     setFilteredProducts(tempProducts)
+  //   } else {
+  //     setFilteredProducts(products)
+  //   }
+  // }, [selectedSizes])
 
-  useEffect(() => {
-    if (colors) {
-      let filtered = colors?.filter((item) => item?.checked)
-      setSelectedColors(filtered)
-    }
-  }, [colors])
+  // useEffect(() => {
+  //   if (colors) {
+  //     let filtered = colors?.filter((item) => item?.checked)
+  //     setSelectedColors(filtered)
+  //   }
+  // }, [colors])
 
-  useEffect(() => {
-    if (sizes) {
-      let filtered = sizes?.filter((item) => item?.checked)
-      setSelectedSizes(filtered)
-    }
-  }, [sizes])
+  // useEffect(() => {
+  //   if (sizes) {
+  //     let filtered = sizes?.filter((item) => item?.checked)
+  //     setSelectedSizes(filtered)
+  //   }
+  // }, [sizes])
 
+  console.log("DATA: ", subCategories)
   return (
     <Layout>
       {/* Mobile filter dialog */}
@@ -362,7 +395,7 @@ export default function SubCategory({ data }) {
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-baseline justify-between border-b border-gray-200 pt-24 pb-6">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-            {subCategoryData && subCategoryData?.name && subCategoryData?.label}
+            {subCategoryData && subCategoryData?.name && subCategoryData?.name}
           </h1>
 
           <div className="flex items-center">
@@ -574,17 +607,15 @@ export default function SubCategory({ data }) {
 
             {/* Product grid */}
             <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 md:grid-cols-3 lg:col-span-3 lg:gap-x-8">
-              {subCategoryData &&
-                filteredProducts?.map((product) => {
+              {products &&
+                products?.map((product) => {
+                  console.log("PROD: ", product)
                   return (
-                    <Link
-                      key={product.reference}
-                      href={`/product/${product?.reference}`}
-                    >
+                    <Link key={product.sku} href={`/product/${product?.sku}`}>
                       <div className="group text-sm cursor-pointer">
                         <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
                           <img
-                            src={product?.images[0]?.url}
+                            src={product?.image?.url}
                             alt={product?.name}
                             className="h-full w-full object-cover object-center"
                           />
@@ -593,10 +624,10 @@ export default function SubCategory({ data }) {
                           {product?.name}
                         </h3>
                         <p className="italic text-gray-500">
-                          {product?.caption}
+                          {product?.seo?.description}
                         </p>
                         <p className="mt-1 text-lg font-medium text-gray-900">
-                          $20
+                          {product?.price?.formatted_with_symbol}
                         </p>
                       </div>
                     </Link>
@@ -611,6 +642,11 @@ export default function SubCategory({ data }) {
 }
 
 export async function getServerSideProps() {
+  const merchant = await commerce.merchants.about()
+  const { data: categories } = await commerce.categories.list()
+  const { data: products } = await commerce.products.list()
+  let data = { merchant, categories, products }
+
   const query = `*[_type == "head"]{
     id,
     name,
@@ -631,51 +667,11 @@ export async function getServerSideProps() {
     bannerImage{
       'url': asset->url
     },
-    'categories': categories[]->{
-      name,
-      label,
-      slug,
-      description,
-      image{
-        'url': asset->url
-      },
-    'subCategories': subCategories[]->{
-      name,
-      label,
-      slug,
-      description,
-      image{
-        'url': asset->url
-      },
-      'products': products[]->{
-        name,
-        description,
-        caption,
-        reference,
-        'colors': colors[]->{
-          name,
-          code,
-        },         
-        'sizes': sizes[]->{
-          name,
-        },
-        'images': images[]->{
-          name,
-          description,
-          'url': images.asset->url
-      }
-    }}},   
-    'favourites':favourites[]->{
-      name,
-        description,
-        caption,
-        reference,
-        'images': images[]->{
-          name,
-          description,
-          'url': images.asset->url
-      }
-    }
+    
+    
+   
+    
+   
 }`
 
   // Get Sanity Data
@@ -691,7 +687,8 @@ export async function getServerSideProps() {
 
   return {
     props: {
-      data: filtered[0],
+      data,
+      sanity: filtered[0],
     },
   }
 }
