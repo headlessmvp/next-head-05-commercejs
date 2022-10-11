@@ -43,9 +43,14 @@ export default function Home({ data, sanity }) {
       <div className="relative overflow-hidden">
         {/* Hero section */}
         <Hero />
-      </div>{" "}
+      </div>
+
       {/* Category section */}
       <Category />
+
+      {/* Featured section */}
+      <Featured />
+
       {/* <h1 className="text-xl mb-4 font-bold">{merchant.business_name}</h1>
 
       <h3 className="text-lg mb-2 font-semibold underline">
