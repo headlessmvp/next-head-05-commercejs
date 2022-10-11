@@ -51,6 +51,11 @@ export default function Home({ data, sanity }) {
       {/* Featured section */}
       <Featured />
 
+      {/* Favorites section */}
+      {/* <Favourites /> */}
+
+      {/* CTA section */}
+      <CTA />
       {/* <h1 className="text-xl mb-4 font-bold">{merchant.business_name}</h1>
 
       <h3 className="text-lg mb-2 font-semibold underline">
