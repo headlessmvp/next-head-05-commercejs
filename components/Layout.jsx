@@ -175,7 +175,11 @@ export const Layout = ({ children }) => {
     const {
         token,
         allData,
-        sanityData
+        sanityData,
+        categories,
+        allProducts,
+        filteredCategories,
+        cart
     } = useContext(ProductContext)
     const [open, setOpen] = useState(false)
 
@@ -185,6 +189,9 @@ export const Layout = ({ children }) => {
         setOrigin(location.origin)
     }, [])
 
+    useEffect(() => { }, categories)
+
+    console.log(cart)
 
     return (
         <CommerceLayer
@@ -260,7 +267,7 @@ export const Layout = ({ children }) => {
                                                     <Tab.Group as="div" className="mt-2">
                                                         <div className="border-b border-gray-200">
                                                             <Tab.List className="-mb-px flex space-x-8 px-4">
-                                                                {allData?.categories?.map((category) => (
+                                                                {categories?.map((category) => (
                                                                     <Tab
                                                                         key={category.name}
                                                                         className={({ selected }) =>
@@ -278,7 +285,7 @@ export const Layout = ({ children }) => {
                                                             </Tab.List>
                                                         </div>
                                                         <Tab.Panels as={Fragment}>
-                                                            {allData?.categories?.map((category) => (
+                                                            {categories?.map((category) => (
                                                                 <Tab.Panel
                                                                     key={category.name}
                                                                     className="space-y-10 px-4 pt-10 pb-8"
@@ -400,154 +407,287 @@ export const Layout = ({ children }) => {
                                                 {/* Flyout menus */}
                                                 <Popover.Group className="hidden lg:ml-8 lg:block lg:self-stretch z-30">
                                                     <div className="flex h-full space-x-8 z-30">
-                                                        {allData && allData?.categories && allData?.categories.map((category) => (
-                                                            <Popover key={category.name} className="flex z-30">
-                                                                {({ open }) => (
-                                                                    <>
-                                                                        <div className="relative flex">
-                                                                            <Popover.Button
-                                                                                className={classNames(
-                                                                                    open
-                                                                                        ? "border-indigo-600 text-indigo-600"
-                                                                                        : "border-transparent text-gray-700 hover:text-gray-800",
-                                                                                    "relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out"
-                                                                                )}
-                                                                            >
-                                                                                {category.name}
-                                                                            </Popover.Button>
-                                                                        </div>
-
-                                                                        <Transition
-                                                                            as={Fragment}
-                                                                            enter="transition ease-out duration-200"
-                                                                            enterFrom="opacity-0"
-                                                                            enterTo="opacity-100"
-                                                                            leave="transition ease-in duration-150"
-                                                                            leaveFrom="opacity-100"
-                                                                            leaveTo="opacity-0"
+                                                        {categories && filteredCategories[0] && <Popover key={filteredCategories[0].name} className="flex z-30">
+                                                            {({ open }) => (
+                                                                <>
+                                                                    <div className="relative flex">
+                                                                        <Popover.Button
+                                                                            className={classNames(
+                                                                                open
+                                                                                    ? "border-indigo-600 text-indigo-600"
+                                                                                    : "border-transparent text-gray-700 hover:text-gray-800",
+                                                                                "relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out"
+                                                                            )}
                                                                         >
-                                                                            <Popover.Panel className="absolute inset-x-0 top-full bg-white text-sm text-gray-500 z-30">
-                                                                                {/* Presentational element used to render the bottom shadow, if we put the shadow on the actual panel it pokes out the top, so we use this shorter element to hide the top of the shadow */}
+                                                                            {filteredCategories[0].name}
+                                                                        </Popover.Button>
+                                                                    </div>
+
+                                                                    <Transition
+                                                                        as={Fragment}
+                                                                        enter="transition ease-out duration-200"
+                                                                        enterFrom="opacity-0"
+                                                                        enterTo="opacity-100"
+                                                                        leave="transition ease-in duration-150"
+                                                                        leaveFrom="opacity-100"
+                                                                        leaveTo="opacity-0"
+                                                                    >
+                                                                        <Popover.Panel className="absolute inset-x-0 top-full bg-white text-sm text-gray-500 z-30">
+
+                                                                            <div
+                                                                                className="absolute inset-0 top-1/2 bg-white shadow"
+                                                                                aria-hidden="true"
+                                                                            />
+                                                                            <div
+                                                                                className="absolute inset-0 top-0 mx-auto h-px max-w-7xl px-8"
+                                                                                aria-hidden="true"
+                                                                            >
                                                                                 <div
-                                                                                    className="absolute inset-0 top-1/2 bg-white shadow"
-                                                                                    aria-hidden="true"
+                                                                                    className={classNames(
+                                                                                        open
+                                                                                            ? "bg-gray-200"
+                                                                                            : "bg-transparent",
+                                                                                        "h-px w-full transition-colors duration-200 ease-out"
+                                                                                    )}
                                                                                 />
-                                                                                {/* Fake border when menu is open */}
-                                                                                <div
-                                                                                    className="absolute inset-0 top-0 mx-auto h-px max-w-7xl px-8"
-                                                                                    aria-hidden="true"
-                                                                                >
-                                                                                    <div
-                                                                                        className={classNames(
-                                                                                            open
-                                                                                                ? "bg-gray-200"
-                                                                                                : "bg-transparent",
-                                                                                            "h-px w-full transition-colors duration-200 ease-out"
-                                                                                        )}
-                                                                                    />
-                                                                                </div>
+                                                                            </div>
 
-                                                                                <div className="relative">
-                                                                                    <div className="mx-auto max-w-7xl px-8">
-                                                                                        <div className="grid grid-cols-2 gap-y-10 gap-x-8 py-16">
-                                                                                            <div className="col-start-2 grid grid-cols-2 gap-x-8">
-                                                                                                {category?.children?.map(
-                                                                                                    (item) => (
-                                                                                                        <div
-                                                                                                            key={item?.id}
-                                                                                                            className="group relative text-base sm:text-sm"
+                                                                            <div className="relative">
+                                                                                <div className="mx-auto max-w-7xl px-8">
+                                                                                    <div className="grid grid-cols-2 gap-y-10 gap-x-8 py-16">
+                                                                                        <div className="col-start-2 grid grid-cols-2 gap-x-8">
+                                                                                            {filteredCategories[0]?.children?.map(
+                                                                                                (item) => (
+                                                                                                    <div
+                                                                                                        key={item?.id}
+                                                                                                        className="group relative text-base sm:text-sm"
+                                                                                                    >
+                                                                                                        <div className="aspect-w-1 aspect-h-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
+                                                                                                            <img
+                                                                                                                src={item?.assets[0]?.url}
+                                                                                                                alt={item?.name}
+                                                                                                                className="object-cover object-center"
+                                                                                                            />
+                                                                                                        </div>
+                                                                                                        <Link
+                                                                                                            href={`/subCategories/${item.slug}`}
                                                                                                         >
-                                                                                                            <div className="aspect-w-1 aspect-h-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
-                                                                                                                <img
-                                                                                                                    src={item?.assets[0]?.url}
-                                                                                                                    alt={item?.name}
-                                                                                                                    className="object-cover object-center"
+                                                                                                            <span className="mt-6 block font-medium text-gray-900"
+                                                                                                            > <span
+                                                                                                                    className="absolute inset-0 z-10"
+                                                                                                                    aria-hidden="true"
                                                                                                                 />
-                                                                                                            </div>
-                                                                                                            <Link
-                                                                                                                href={`/subCategories/${item.slug}`}
-                                                                                                            >
-                                                                                                                <span className="mt-6 block font-medium text-gray-900"
-                                                                                                                > <span
-                                                                                                                        className="absolute inset-0 z-10"
-                                                                                                                        aria-hidden="true"
-                                                                                                                    />
-                                                                                                                    {item?.name}</span>
+                                                                                                                {item?.name}</span>
 
-                                                                                                            </Link>
+                                                                                                        </Link>
+                                                                                                        <p
+                                                                                                            aria-hidden="true"
+                                                                                                            className="mt-1"
+                                                                                                        >
+                                                                                                            Shop now
+                                                                                                        </p>
+                                                                                                    </div>
+                                                                                                )
+                                                                                            )}
+                                                                                        </div>
+                                                                                        <div className="row-start-1 grid grid-cols-3 gap-y-10 gap-x-8 text-sm">
+                                                                                            {filteredCategories[0]?.children?.map(
+                                                                                                (subCategory) => {
+                                                                                                    let products = []
+
+                                                                                                    let filtered
+                                                                                                    allProducts?.map((prod) => {
+                                                                                                        filtered = prod?.categories?.filter(subCat => subCat?.id === subCategory?.id)
+                                                                                                        if (filtered[0]) {
+                                                                                                            products.push(prod)
+                                                                                                        }
+                                                                                                    })
+                                                                                                    if (products?.length === 0) return null
+
+                                                                                                    return (
+                                                                                                        <div key={subCategory?.id}>
                                                                                                             <p
-                                                                                                                aria-hidden="true"
-                                                                                                                className="mt-1"
+                                                                                                                id={`${subCategory.id}-heading`}
+                                                                                                                className="font-medium text-gray-900"
                                                                                                             >
-                                                                                                                Shop now
+                                                                                                                {subCategory?.name}
                                                                                                             </p>
+                                                                                                            <ul
+                                                                                                                role="list"
+                                                                                                                aria-labelledby={`${subCategory?.id}-heading`}
+                                                                                                                className="mt-6 space-y-6 sm:mt-4 sm:space-y-4"
+                                                                                                            >
+                                                                                                                {products.map(
+                                                                                                                    (item) => (
+                                                                                                                        <li
+                                                                                                                            key={item?.name}
+                                                                                                                            className="flex"
+                                                                                                                        >
+                                                                                                                            <a
+                                                                                                                                href={item?.reference}
+                                                                                                                                className="hover:text-gray-800"
+                                                                                                                            >
+                                                                                                                                {item?.name}
+                                                                                                                            </a>
+                                                                                                                        </li>
+                                                                                                                    )
+                                                                                                                )}
+                                                                                                            </ul>
                                                                                                         </div>
                                                                                                     )
-                                                                                                )}
-                                                                                            </div>
-                                                                                            <div className="row-start-1 grid grid-cols-3 gap-y-10 gap-x-8 text-sm">
-                                                                                                {category?.children?.map(
-                                                                                                    (subCategory) => {
-                                                                                                        let products = []
-                                                                                                        // console.log("SUB CAT: ", subCategory)
-                                                                                                        // console.log("PRODUCTS: ", allData?.products)
-
-                                                                                                        let filtered
-                                                                                                        allData?.products?.map((prod) => {
-                                                                                                            // console.log("MAPPING: ", prod)
-                                                                                                            filtered = prod?.categories?.filter(subCat => subCat?.id === subCategory?.id)
-                                                                                                            // console.log("FILTERRR: ", filtered)
-                                                                                                            if (filtered[0]) {
-                                                                                                                products.push(prod)
-                                                                                                            }
-                                                                                                        })
-                                                                                                        // console.log("FILTERED: ", filtered)
-                                                                                                        if (products?.length === 0) return null
-                                                                                                        // console.log("PRODS TO SHOW: ", products)
-
-                                                                                                        return (
-                                                                                                            <div key={subCategory?.id}>
-                                                                                                                <p
-                                                                                                                    id={`${subCategory.id}-heading`}
-                                                                                                                    className="font-medium text-gray-900"
-                                                                                                                >
-                                                                                                                    {subCategory?.name}
-                                                                                                                </p>
-                                                                                                                <ul
-                                                                                                                    role="list"
-                                                                                                                    aria-labelledby={`${subCategory?.id}-heading`}
-                                                                                                                    className="mt-6 space-y-6 sm:mt-4 sm:space-y-4"
-                                                                                                                >
-                                                                                                                    {products.map(
-                                                                                                                        (item) => (
-                                                                                                                            <li
-                                                                                                                                key={item?.name}
-                                                                                                                                className="flex"
-                                                                                                                            >
-                                                                                                                                <a
-                                                                                                                                    href={item?.reference}
-                                                                                                                                    className="hover:text-gray-800"
-                                                                                                                                >
-                                                                                                                                    {item?.name}
-                                                                                                                                </a>
-                                                                                                                            </li>
-                                                                                                                        )
-                                                                                                                    )}
-                                                                                                                </ul>
-                                                                                                            </div>
-                                                                                                        )
-                                                                                                    }
-                                                                                                )}
-                                                                                            </div>
+                                                                                                }
+                                                                                            )}
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
-                                                                            </Popover.Panel>
-                                                                        </Transition>
-                                                                    </>
-                                                                )}
-                                                            </Popover>
-                                                        ))}
+                                                                            </div>
+                                                                        </Popover.Panel>
+                                                                    </Transition>
+                                                                </>
+                                                            )}
+                                                        </Popover>}
+
+                                                        {categories && filteredCategories[1] && <Popover key={filteredCategories[1].name} className="flex z-30">
+                                                            {({ open }) => (
+                                                                <>
+                                                                    <div className="relative flex">
+                                                                        <Popover.Button
+                                                                            className={classNames(
+                                                                                open
+                                                                                    ? "border-indigo-600 text-indigo-600"
+                                                                                    : "border-transparent text-gray-700 hover:text-gray-800",
+                                                                                "relative z-10 -mb-px flex items-center border-b-2 pt-px text-sm font-medium transition-colors duration-200 ease-out"
+                                                                            )}
+                                                                        >
+                                                                            {filteredCategories[1].name}
+                                                                        </Popover.Button>
+                                                                    </div>
+
+                                                                    <Transition
+                                                                        as={Fragment}
+                                                                        enter="transition ease-out duration-200"
+                                                                        enterFrom="opacity-0"
+                                                                        enterTo="opacity-100"
+                                                                        leave="transition ease-in duration-150"
+                                                                        leaveFrom="opacity-100"
+                                                                        leaveTo="opacity-0"
+                                                                    >
+                                                                        <Popover.Panel className="absolute inset-x-0 top-full bg-white text-sm text-gray-500 z-30">
+
+                                                                            <div
+                                                                                className="absolute inset-0 top-1/2 bg-white shadow"
+                                                                                aria-hidden="true"
+                                                                            />
+                                                                            <div
+                                                                                className="absolute inset-0 top-0 mx-auto h-px max-w-7xl px-8"
+                                                                                aria-hidden="true"
+                                                                            >
+                                                                                <div
+                                                                                    className={classNames(
+                                                                                        open
+                                                                                            ? "bg-gray-200"
+                                                                                            : "bg-transparent",
+                                                                                        "h-px w-full transition-colors duration-200 ease-out"
+                                                                                    )}
+                                                                                />
+                                                                            </div>
+
+                                                                            <div className="relative">
+                                                                                <div className="mx-auto max-w-7xl px-8">
+                                                                                    <div className="grid grid-cols-2 gap-y-10 gap-x-8 py-16">
+                                                                                        <div className="col-start-2 grid grid-cols-2 gap-x-8">
+                                                                                            {filteredCategories[1]?.children?.map(
+                                                                                                (item) => (
+                                                                                                    <div
+                                                                                                        key={item?.id}
+                                                                                                        className="group relative text-base sm:text-sm"
+                                                                                                    >
+                                                                                                        <div className="aspect-w-1 aspect-h-1 overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
+                                                                                                            <img
+                                                                                                                src={item?.assets[0]?.url}
+                                                                                                                alt={item?.name}
+                                                                                                                className="object-cover object-center"
+                                                                                                            />
+                                                                                                        </div>
+                                                                                                        <Link
+                                                                                                            href={`/subCategories/${item.slug}`}
+                                                                                                        >
+                                                                                                            <span className="mt-6 block font-medium text-gray-900"
+                                                                                                            > <span
+                                                                                                                    className="absolute inset-0 z-10"
+                                                                                                                    aria-hidden="true"
+                                                                                                                />
+                                                                                                                {item?.name}</span>
+
+                                                                                                        </Link>
+                                                                                                        <p
+                                                                                                            aria-hidden="true"
+                                                                                                            className="mt-1"
+                                                                                                        >
+                                                                                                            Shop now
+                                                                                                        </p>
+                                                                                                    </div>
+                                                                                                )
+                                                                                            )}
+                                                                                        </div>
+                                                                                        <div className="row-start-1 grid grid-cols-3 gap-y-10 gap-x-8 text-sm">
+                                                                                            {filteredCategories[1]?.children?.map(
+                                                                                                (subCategory) => {
+                                                                                                    let products = []
+
+                                                                                                    let filtered
+                                                                                                    allProducts?.map((prod) => {
+                                                                                                        filtered = prod?.categories?.filter(subCat => subCat?.id === subCategory?.id)
+                                                                                                        if (filtered[0]) {
+                                                                                                            products.push(prod)
+                                                                                                        }
+                                                                                                    })
+                                                                                                    if (products?.length === 0) return null
+
+                                                                                                    return (
+                                                                                                        <div key={subCategory?.id}>
+                                                                                                            <p
+                                                                                                                id={`${subCategory.id}-heading`}
+                                                                                                                className="font-medium text-gray-900"
+                                                                                                            >
+                                                                                                                {subCategory?.name}
+                                                                                                            </p>
+                                                                                                            <ul
+                                                                                                                role="list"
+                                                                                                                aria-labelledby={`${subCategory?.id}-heading`}
+                                                                                                                className="mt-6 space-y-6 sm:mt-4 sm:space-y-4"
+                                                                                                            >
+                                                                                                                {products.map(
+                                                                                                                    (item) => (
+                                                                                                                        <li
+                                                                                                                            key={item?.name}
+                                                                                                                            className="flex"
+                                                                                                                        >
+                                                                                                                            <a
+                                                                                                                                href={item?.reference}
+                                                                                                                                className="hover:text-gray-800"
+                                                                                                                            >
+                                                                                                                                {item?.name}
+                                                                                                                            </a>
+                                                                                                                        </li>
+                                                                                                                    )
+                                                                                                                )}
+                                                                                                            </ul>
+                                                                                                        </div>
+                                                                                                    )
+                                                                                                }
+                                                                                            )}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </Popover.Panel>
+                                                                    </Transition>
+                                                                </>
+                                                            )}
+                                                        </Popover>}
+
+
 
                                                         {navigation.pages.map((page) => (
                                                             <a

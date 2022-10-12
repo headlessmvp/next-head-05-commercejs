@@ -6,10 +6,15 @@ import Link from 'next/link'
 // Context
 import { useContext } from 'react'
 import { ProductContext } from '../../context/ProductContext'
+import { useState } from 'react'
+import { useEffect } from 'react'
 
 export const Category = () => {
 
-    const { allData } = useContext(ProductContext)
+    const { filteredCategories } = useContext(ProductContext)
+
+
+
 
     return (
         <section aria-labelledby="category-heading" className="bg-gray-50">
@@ -25,10 +30,10 @@ export const Category = () => {
                 </div>
 
                 <div className="mt-6 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:grid-rows-2 sm:gap-x-6 lg:gap-8">
-                    {allData?.categories && allData?.categories[0] && <Link href={`/category/${allData?.categories[0]?.slug}`}><div className="group aspect-w-2 aspect-h-1 overflow-hidden rounded-lg sm:aspect-h-1 sm:aspect-w-1 sm:row-span-2">
+                    {filteredCategories && filteredCategories[0] && <Link href={`/category/${filteredCategories[0]?.slug}`}><div className="group aspect-w-2 aspect-h-1 overflow-hidden rounded-lg sm:aspect-h-1 sm:aspect-w-1 sm:row-span-2">
                         <img
-                            src={allData?.categories[0]?.assets[0]?.url}
-                            alt={allData?.categories[0]?.name}
+                            src={filteredCategories[0]?.assets[0]?.url}
+                            alt={filteredCategories[0]?.name}
                             className="object-cover object-center group-hover:opacity-75"
                         />
                         <div aria-hidden="true" className="bg-gradient-to-b from-transparent to-black opacity-50" />
@@ -37,7 +42,7 @@ export const Category = () => {
                                 <h3 className="font-semibold text-white">
                                     <a href="#">
                                         <span className="absolute inset-0" />
-                                        {allData?.categories[0]?.name}
+                                        {filteredCategories[0]?.name}
                                     </a>
                                 </h3>
                                 <p aria-hidden="true" className="mt-1 text-sm text-white">
@@ -47,10 +52,10 @@ export const Category = () => {
                         </div>
                     </div></Link>}
 
-                    {allData?.categories && allData?.categories[1] && <Link href={`/category/${allData?.categories[1]?.slug}`}><div className="group aspect-w-2 aspect-h-1 overflow-hidden rounded-lg sm:aspect-none sm:relative sm:h-full">
+                    {filteredCategories && filteredCategories[1] && <Link href={`/category/${filteredCategories[1]?.slug}`}><div className="group aspect-w-2 aspect-h-1 overflow-hidden rounded-lg sm:aspect-none sm:relative sm:h-full">
                         <img
-                            src={allData?.categories[1]?.assets[1]?.url}
-                            alt={allData?.categories[1]?.name}
+                            src={filteredCategories[1]?.assets[0]?.url}
+                            alt={filteredCategories[1]?.name}
                             className="object-cover object-center group-hover:opacity-75 sm:absolute sm:inset-0 sm:h-full sm:w-full"
                         />
                         <div
@@ -62,7 +67,7 @@ export const Category = () => {
                                 <h3 className="font-semibold text-white">
                                     <a href="#">
                                         <span className="absolute inset-0" />
-                                        {allData?.categories[1]?.name}
+                                        {filteredCategories[1]?.name}
                                     </a>
                                 </h3>
                                 <p aria-hidden="true" className="mt-1 text-sm text-white">
@@ -73,10 +78,10 @@ export const Category = () => {
                     </div></Link>}
 
 
-                    {allData?.categories && allData?.categories[2] && <Link href={`/category/${allData?.categories[2]?.slug}`}><div className="group aspect-w-2 aspect-h-1 overflow-hidden rounded-lg sm:aspect-none sm:relative sm:h-full">
+                    {filteredCategories && filteredCategories[2] && <Link href={`/category/${filteredCategories[2]?.slug}`}><div className="group aspect-w-2 aspect-h-1 overflow-hidden rounded-lg sm:aspect-none sm:relative sm:h-full">
                         <img
-                            src={allData?.categories[2]?.assets[2]?.url}
-                            alt={allData?.categories[2]?.name}
+                            src={filteredCategories[2]?.assets[0]?.url}
+                            alt={filteredCategories[2]?.name}
                             className="object-cover object-center group-hover:opacity-75 sm:absolute sm:inset-0 sm:h-full sm:w-full"
                         />
                         <div
@@ -88,7 +93,7 @@ export const Category = () => {
                                 <h3 className="font-semibold text-white">
                                     <a href="#">
                                         <span className="absolute inset-0" />
-                                        {allData?.categories[2]?.name}
+                                        {filteredCategories[2]?.name}
                                     </a>
                                 </h3>
                                 <p aria-hidden="true" className="mt-1 text-sm text-white">

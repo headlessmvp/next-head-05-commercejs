@@ -3,6 +3,9 @@ import { Fragment, useState, useContext, useEffect } from "react"
 // Headless UI
 import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react"
 
+// Constants
+import { GET_SANITY_DATA } from "../../../../constants/sanity"
+
 // Heroicons
 import { XMarkIcon } from "@heroicons/react/24/outline"
 import {
@@ -41,7 +44,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
 
-export default function SubCategory({ data, sanity }) {
+export default function SubCategory({ category, products, sanity }) {
   const router = useRouter()
 
   const {
@@ -60,52 +63,52 @@ export default function SubCategory({ data, sanity }) {
   const [selectedColors, setSelectedColors] = useState([])
   const [selectedSizes, setSelectedSizes] = useState([])
   const [filteredProducts, setFilteredProducts] = useState([])
-  const [products, setProducts] = useState([])
+  // const [products, setProducts] = useState([])
 
   useEffect(() => {
-    setAllData(data)
+    // setAllData(data)
     setSanityData(sanity)
   }, [])
 
-  useEffect(() => {
-    if (allData?.categories) {
-      let subCatTemp = []
-      data?.categories?.map((category) => {
-        category?.children?.map((sub) => subCatTemp.push(sub))
-      })
-      setSubCategories(subCatTemp)
-    }
-  }, [allData])
+  // useEffect(() => {
+  //   if (allData?.categories) {
+  //     let subCatTemp = []
+  //     data?.categories?.map((category) => {
+  //       category?.children?.map((sub) => subCatTemp.push(sub))
+  //     })
+  //     setSubCategories(subCatTemp)
+  //   }
+  // }, [allData])
 
-  useEffect(() => {
-    if (subCategories?.length) {
-      let tempProducts = []
+  // useEffect(() => {
+  //   if (subCategories?.length) {
+  //     let tempProducts = []
 
-      let filteredSubCat = subCategories?.filter(
-        (item) => item.slug === router.query.slug
-      )
+  //     let filteredSubCat = subCategories?.filter(
+  //       (item) => item.slug === router.query.slug
+  //     )
 
-      // console.log("SUB CAT: ", filteredSubCat)
-      // console.log("PRODUCTS: ", allData?.products)
+  //     // console.log("SUB CAT: ", filteredSubCat)
+  //     // console.log("PRODUCTS: ", allData?.products)
 
-      let filtered
+  //     let filtered
 
-      allData?.products?.map((prod) => {
-        console.log("MAPPING: ", prod, filteredSubCat)
-        filtered = prod?.categories?.filter(
-          (subCat) => subCat?.id === filteredSubCat[0]?.id
-        )
-        console.log("FILTERRR: ", filtered)
-        if (filtered[0]) {
-          tempProducts.push(prod)
-        }
-      })
-      // console.log("FILTERED: ", filtered)
-      console.log("TEMP PRODS: : ", tempProducts)
-      setProducts(tempProducts)
-      setSubCategoryData(...filteredSubCat)
-    }
-  }, [subCategories])
+  //     allData?.products?.map((prod) => {
+  //       console.log("MAPPING: ", prod, filteredSubCat)
+  //       filtered = prod?.categories?.filter(
+  //         (subCat) => subCat?.id === filteredSubCat[0]?.id
+  //       )
+  //       console.log("FILTERRR: ", filtered)
+  //       if (filtered[0]) {
+  //         tempProducts.push(prod)
+  //       }
+  //     })
+  //     // console.log("FILTERED: ", filtered)
+  //     console.log("TEMP PRODS: : ", tempProducts)
+  //     setProducts(tempProducts)
+  //     setSubCategoryData(...filteredSubCat)
+  //   }
+  // }, [subCategories])
 
   // useEffect(() => {
   //   if (subCategoryData?.name) {
@@ -226,7 +229,7 @@ export default function SubCategory({ data, sanity }) {
   //   }
   // }, [sizes])
 
-  console.log("DATA: ", subCategories)
+  console.log("DATA: ", category, products)
   return (
     <Layout>
       {/* Mobile filter dialog */}
@@ -332,7 +335,7 @@ export default function SubCategory({ data, sanity }) {
                   )}
 
                   {/* Sizes */}
-                  {subCategoryData && subCategoryData?.name && colors?.length && (
+                  {category && category?.name && colors?.length && (
                     <Disclosure
                       as="div"
                       className="border-t border-gray-200 px-4 py-6"
@@ -395,7 +398,7 @@ export default function SubCategory({ data, sanity }) {
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-baseline justify-between border-b border-gray-200 pt-24 pb-6">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-            {subCategoryData && subCategoryData?.name && subCategoryData?.name}
+            {category && category?.name && category?.name}
           </h1>
 
           <div className="flex items-center">
@@ -611,7 +614,10 @@ export default function SubCategory({ data, sanity }) {
                 products?.map((product) => {
                   console.log("PROD: ", product)
                   return (
-                    <Link key={product.sku} href={`/product/${product?.sku}`}>
+                    <Link
+                      key={product.sku}
+                      href={`/product/${product?.permalink}`}
+                    >
                       <div className="group text-sm cursor-pointer">
                         <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
                           <img
@@ -641,41 +647,28 @@ export default function SubCategory({ data, sanity }) {
   )
 }
 
-export async function getServerSideProps() {
-  const merchant = await commerce.merchants.about()
-  const { data: categories } = await commerce.categories.list()
-  const { data: products } = await commerce.products.list()
-  let data = { merchant, categories, products }
+export async function getServerSideProps({ params }) {
+  const { slug } = params
+  let products = []
 
-  const query = `*[_type == "head"]{
-    id,
-    name,
-    country,
-    flag{
-      'url': asset->url
-    },
-    headline,
-    subHeading,
-    'images': images[]->{
-      name,
-      'url': images.asset->url
-    },
-    url,
-    bannerHeading,
-    bannerText,
-    saleText,
-    bannerImage{
-      'url': asset->url
-    },
-    
-    
-   
-    
-   
-}`
+  const category = await commerce.categories.retrieve(slug, {
+    type: "slug",
+  })
+
+  try {
+    const { data } = await commerce.products.list({
+      category_slug: [slug],
+    })
+
+    if (data) {
+      products = data
+    }
+  } catch (error) {
+    products = []
+  }
 
   // Get Sanity Data
-  const heads = await client.fetch(query)
+  const heads = await client.fetch(GET_SANITY_DATA)
 
   let filtered = {}
 
@@ -687,7 +680,8 @@ export async function getServerSideProps() {
 
   return {
     props: {
-      data,
+      category,
+      products,
       sanity: filtered[0],
     },
   }

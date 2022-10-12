@@ -10,6 +10,9 @@ import { Layout } from "../../components/Layout"
 import { useRouter } from "next/router"
 import Image from "next/image"
 
+// Constant
+import { GET_SANITY_DATA } from "../../constants/sanity"
+
 // Sanity Client
 import { client } from "../../lib/client"
 
@@ -63,7 +66,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
 
-export default function Example({ data, sanity }) {
+export default function Example({ data, sanity, product }) {
   const {
     setAllData,
     allData,
@@ -86,6 +89,8 @@ export default function Example({ data, sanity }) {
     setSanityData(sanity)
   }, [])
 
+  console.log("PRODUCT: ", product)
+
   useEffect(() => {
     let filtered = data?.products?.filter(
       (product) => product?.sku === router.query.id
@@ -99,10 +104,10 @@ export default function Example({ data, sanity }) {
   console.log("DATA: ", productDetails)
 
   // useEffect(() => {
-  //   if (productDetails?.sizes) {
+  //   if (product?.sizes) {
   //     let tempShowSizes = []
   //     sizes?.map((size) => {
-  //       let filtered = productDetails?.sizes?.filter(
+  //       let filtered = product?.sizes?.filter(
   //         (item) => item.name === size.name
   //       )
   //       if (filtered[0]) {
@@ -116,12 +121,12 @@ export default function Example({ data, sanity }) {
   // }, [productDetails])
 
   useEffect(() => {
-    if (productDetails?.sku) {
+    if (product?.sku) {
       ;(async function run() {
         const results = await fetch("/api/search", {
           method: "POST",
           body: JSON.stringify({
-            expression: `context.reference:${productDetails?.sku}`,
+            expression: `context.reference:${product?.sku}`,
             with_field: "context",
             max_results: 4,
           }),
@@ -141,11 +146,11 @@ export default function Example({ data, sanity }) {
             <div className="lg:col-span-5 lg:col-start-8">
               <div className="flex justify-between">
                 <h1 className="text-xl font-medium text-gray-900">
-                  {productDetails?.name}
+                  {product?.name}
                 </h1>
                 <p className="text-xl font-medium text-gray-900">
                   {" "}
-                  {productDetails?.price?.formatted_with_symbol}
+                  {product?.price?.formatted_with_symbol}
                 </p>
               </div>
             </div>
@@ -208,7 +213,7 @@ export default function Example({ data, sanity }) {
                       Choose a color{" "}
                     </RadioGroup.Label>
                     <div className="flex items-center space-x-3">
-                      {productDetails?.colors?.map((color) => (
+                      {product?.colors?.map((color) => (
                         <RadioGroup.Option
                           key={color.name}
                           value={color}
@@ -283,7 +288,7 @@ export default function Example({ data, sanity }) {
 
                 <AddToCartButton
                   label={"Add to cart"}
-                  skuCode={productDetails?.reference}
+                  skuCode={product?.reference}
                   className="mt-8 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 py-3 px-8 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 />
 
@@ -302,7 +307,7 @@ export default function Example({ data, sanity }) {
                 <div
                   className="prose prose-sm mt-4 text-gray-500"
                   dangerouslySetInnerHTML={{
-                    __html: productDetails.description,
+                    __html: product?.description,
                   }}
                 />
               </div>
@@ -315,7 +320,7 @@ export default function Example({ data, sanity }) {
 
                 <div className="prose prose-sm mt-4 text-gray-500">
                   <ul role="list">
-                    {productDetails?.highlights?.map((item) => (
+                    {product?.highlights?.map((item) => (
                       <li key={item}>{item}</li>
                     ))}
                   </ul>
@@ -363,12 +368,12 @@ export default function Example({ data, sanity }) {
             </h2>
 
             <div className="mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-              {relatedProducts.map((relatedProduct) => (
+              {product?.related_products?.map((relatedProduct) => (
                 <div key={relatedProduct.id} className="group relative">
                   <div className="min-h-80 aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-md group-hover:opacity-75 lg:aspect-none lg:h-80">
                     <img
-                      src={relatedProduct.imageSrc}
-                      alt={relatedProduct.imageAlt}
+                      src={relatedProduct?.image?.url}
+                      alt={relatedProduct?.name}
                       className="h-full w-full object-cover object-center lg:h-full lg:w-full"
                     />
                   </div>
@@ -380,15 +385,15 @@ export default function Example({ data, sanity }) {
                             aria-hidden="true"
                             className="absolute inset-0"
                           />
-                          {relatedProduct.name}
+                          {relatedProduct?.name}
                         </a>
                       </h3>
                       <p className="mt-1 text-sm text-gray-500">
-                        {relatedProduct.color}
+                        {/* {relatedProduct.color} */}
                       </p>
                     </div>
                     <p className="text-sm font-medium text-gray-900">
-                      {relatedProduct.price}
+                      {relatedProduct?.price?.formatted_with_symbol}
                     </p>
                   </div>
                 </div>
@@ -401,41 +406,20 @@ export default function Example({ data, sanity }) {
   )
 }
 
-export async function getServerSideProps() {
+export async function getServerSideProps({ params }) {
   const merchant = await commerce.merchants.about()
   const { data: categories } = await commerce.categories.list()
   const { data: products } = await commerce.products.list()
   let data = { merchant, categories, products }
 
-  const query = `*[_type == "head"]{
-    id,
-    name,
-    country,
-    flag{
-      'url': asset->url
-    },
-    headline,
-    subHeading,
-    'images': images[]->{
-      name,
-      'url': images.asset->url
-    },
-    url,
-    bannerHeading,
-    bannerText,
-    saleText,
-    bannerImage{
-      'url': asset->url
-    },
-    
-    
-   
-    
-   
-}`
+  const { permalink } = params
 
+  const product = await commerce.products.retrieve(permalink, {
+    type: "permalink",
+  })
+  console.log("PRODUCT ================", product)
   // Get Sanity Data
-  const heads = await client.fetch(query)
+  const heads = await client.fetch(GET_SANITY_DATA)
 
   let filtered = {}
 
@@ -449,6 +433,7 @@ export async function getServerSideProps() {
     props: {
       data,
       sanity: filtered[0],
+      product,
     },
   }
 }

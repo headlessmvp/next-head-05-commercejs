@@ -2,14 +2,21 @@ import { createContext, useEffect, useState } from "react"
 
 // Commerce Layer
 import { getSalesChannelToken } from "@commercelayer/js-auth"
+import commerce from "../lib/commerce"
 
 export const ProductContext = createContext()
 
 export const ProductProvider = ({ children }) => {
   const [products, setProducts] = useState([])
+  const [allProducts, setAllProducts] = useState([])
+
   const [subCategories, setSubCategories] = useState([])
   const [allData, setAllData] = useState([])
   const [sanityData, setSanityData] = useState([])
+  const [categories, setCategories] = useState([])
+  const [merchant, setMerchant] = useState({})
+
+  const [filteredCategories, setFilteredCategories] = useState([])
 
   const [cart, setCart] = useState([])
   const [token, setToken] = useState("")
@@ -54,8 +61,39 @@ export const ProductProvider = ({ children }) => {
     }
   }
 
+  const getCart = async () => {
+    const resp = await commerce.cart.retrieve()
+    setCart(resp)
+  }
+
+  const getData = async () => {
+    const merchant = await commerce.merchants.about()
+    const { data: cats } = await commerce.categories.list()
+    const { data: products } = await commerce.products.list()
+    let temp = []
+    if (cats) {
+      cats?.map((category) => {
+        if (
+          category?.slug === "sale" ||
+          category?.slug === "favourites" ||
+          category?.slug === "collection"
+        ) {
+        } else {
+          temp.push(category)
+        }
+      })
+
+      setFilteredCategories(temp)
+    }
+    setMerchant(merchant)
+    setCategories(cats)
+    setAllData(products)
+  }
+
   useEffect(() => {
     // console.log("Use effect context !")
+    getData()
+    getCart()
 
     if (auth === null) {
       getToken()
@@ -86,6 +124,14 @@ export const ProductProvider = ({ children }) => {
         compareSizes,
         sanityData,
         setSanityData,
+        categories,
+        setCategories,
+        merchant,
+        setMerchant,
+        allProducts,
+        setAllProducts,
+        filteredCategories,
+        setFilteredCategories,
       }}
     >
       {children}
