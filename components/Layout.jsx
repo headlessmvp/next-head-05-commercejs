@@ -854,10 +854,9 @@ export const Layout = ({ children }) => {
 
 
                                                                     <p className="text-base">Total: {cart?.subtotal?.formatted_with_symbol}</p>
-                                                                    <CheckoutLink
-                                                                        type="submit"
-                                                                        className="w-full rounded-md border border-transparent bg-indigo-600 mt-6 py-2 px-4 text-center text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50"
-                                                                    />
+                                                                    <a href={cart?.hosted_checkout_url} className="w-full rounded-md border border-transparent bg-indigo-600 mt-6 py-2 px-4 text-center text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50 block"
+                                                                    >Checkout</a>
+
 
                                                                 </div>
                                                             </Popover.Panel>
