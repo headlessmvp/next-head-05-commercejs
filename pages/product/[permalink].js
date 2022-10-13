@@ -8,7 +8,6 @@ import { Layout } from "../../components/Layout"
 
 // Next
 import { useRouter } from "next/router"
-import Image from "next/image"
 
 // Constant
 import { GET_SANITY_DATA } from "../../constants/sanity"
@@ -26,14 +25,7 @@ import { cloudinaryUrl } from "../../utils"
 // Context
 import { ProductContext } from "../../context/ProductContext"
 
-// Commerce Layer
-import {
-  AddToCartButton,
-  PricesContainer,
-  Price,
-  Errors,
-  ItemContainer,
-} from "@commercelayer/react-components"
+// Link
 import Link from "next/link"
 
 const policies = [
@@ -49,34 +41,12 @@ const policies = [
   },
 ]
 
-const relatedProducts = [
-  {
-    id: 1,
-    name: "Basic Tee",
-    href: "#",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-02.jpg",
-    imageAlt: "Front of men's Basic Tee in white.",
-    price: "$35",
-    color: "Aspen White",
-  },
-  // More products...
-]
-
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
 
 export default function Example({ data, sanity, product }) {
-  const {
-    setAllData,
-    allData,
-    setSubCategories,
-    setSanityData,
-    subCategories,
-    sanityData,
-    setCart,
-  } = useContext(ProductContext)
+  const { setSanityData, setCart } = useContext(ProductContext)
 
   const [selectedColor, setSelectedColor] = useState()
   const [selectedSize, setSelectedSize] = useState()
@@ -100,7 +70,6 @@ export default function Example({ data, sanity, product }) {
   }
 
   useEffect(() => {
-    setAllData(data)
     setSanityData(sanity)
   }, [])
 
@@ -311,10 +280,6 @@ export default function Example({ data, sanity, product }) {
                   {error}
                 </div>
               )}
-              {/* <Errors
-                  className="text-red-500 my-2 block text-center"
-                  resource="orders"
-                /> */}
             </div>
 
             {/* Product details */}
@@ -328,21 +293,6 @@ export default function Example({ data, sanity, product }) {
                 }}
               />
             </div>
-
-            {/* Highlights */}
-            {/* <div className="mt-8 border-t border-gray-200 pt-8">
-                <h2 className="text-sm font-medium text-gray-900">
-                  Highlights
-                </h2>
-
-                <div className="prose prose-sm mt-4 text-gray-500">
-                  <ul role="list">
-                    {product?.highlights?.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div> */}
 
             {/* Policies */}
             <section aria-labelledby="policies-heading" className="mt-10">
@@ -438,7 +388,7 @@ export async function getServerSideProps({ params }) {
   const product = await commerce.products.retrieve(permalink, {
     type: "permalink",
   })
-  console.log("PRODUCT ================", product)
+
   // Get Sanity Data
   const heads = await client.fetch(GET_SANITY_DATA)
 
