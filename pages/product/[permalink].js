@@ -45,15 +45,16 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
 
-export default function Example({ data, sanity, product }) {
+export default function Example({ sanity, product, variants }) {
   const { setSanityData, setCart } = useContext(ProductContext)
 
   const [selectedColor, setSelectedColor] = useState()
   const [selectedSize, setSelectedSize] = useState()
-  const [productDetails, setProductDetails] = useState({})
   const [showSizes, setShowSizes] = useState([])
   const [images, setImages] = useState()
   const [error, setError] = useState("")
+  const [colors, setColors] = useState([])
+  const [sizes, setSizes] = useState([])
 
   const router = useRouter()
 
@@ -73,19 +74,18 @@ export default function Example({ data, sanity, product }) {
     setSanityData(sanity)
   }, [])
 
-  console.log("PRODUCT: ", product)
-
   useEffect(() => {
-    let filtered = data?.products?.filter(
-      (product) => product?.sku === router.query.id
-    )
-    console.log("FILTERED: ", filtered)
-    if (filtered?.length > 0) {
-      setProductDetails(...filtered)
+    console.log("VARIANTS : ", variants)
+    if (variants?.length > 0) {
+      variants.map((variant) => {
+        if (variant?.name === "Color") {
+          setColors(variant?.options)
+        } else if (variant?.name === "Size") {
+          setSizes(variant?.options)
+        }
+      })
     }
-  }, [])
-
-  console.log("DATA: ", productDetails)
+  }, variants)
 
   // useEffect(() => {
   //   if (product?.sizes) {
@@ -120,8 +120,9 @@ export default function Example({ data, sanity, product }) {
         setImages(imgs)
       })()
     }
-  }, [productDetails])
+  }, [product])
 
+  console.log("VARIAAAA : ", sizes)
   return (
     <Layout>
       <main className="mx-auto mt-8 max-w-2xl px-4 pb-16 sm:px-6 sm:pb-24 lg:max-w-7xl lg:px-8">
@@ -192,32 +193,32 @@ export default function Example({ data, sanity, product }) {
                   className="mt-2"
                 >
                   <RadioGroup.Label className="sr-only">
-                    {" "}
-                    Choose a color{" "}
+                    Choose a color
                   </RadioGroup.Label>
                   <div className="flex items-center space-x-3">
-                    {product?.colors?.map((color) => (
+                    {colors?.map((color) => (
                       <RadioGroup.Option
-                        key={color.name}
-                        value={color}
+                        key={color.id}
+                        value={color.id}
                         className={({ active, checked }) =>
                           classNames(
-                            color.selectedColor,
-                            active && checked ? "ring ring-offset-1" : "",
-                            !active && checked ? "ring-2" : "",
-                            "-m-0.5 relative p-0.5 rounded-full flex items-center justify-center cursor-pointer focus:outline-none"
+                            color.id
+                              ? "cursor-pointer focus:outline-none"
+                              : "opacity-25 cursor-not-allowed",
+                            active
+                              ? "ring-2 ring-offset-2 ring-indigo-500"
+                              : "",
+                            checked
+                              ? "bg-indigo-600 border-transparent text-white hover:bg-indigo-700"
+                              : "bg-white border-gray-200 text-gray-900 hover:bg-gray-50",
+                            "border rounded-md py-3 px-2 flex items-center justify-center text-xs sm:flex-1"
                           )
                         }
+                        disabled={!color.id}
                       >
-                        <RadioGroup.Label as="span" className="sr-only">
-                          {" "}
-                          {color.name}{" "}
+                        <RadioGroup.Label as="span">
+                          {color.name}
                         </RadioGroup.Label>
-                        <span
-                          aria-hidden="true"
-                          style={{ background: color.code }}
-                          className="h-8 w-8 border border-black border-opacity-10 rounded-full"
-                        />
                       </RadioGroup.Option>
                     ))}
                   </div>
@@ -240,13 +241,13 @@ export default function Example({ data, sanity, product }) {
                     Choose a size{" "}
                   </RadioGroup.Label>
                   <div className="grid grid-cols-3 gap-3 sm:grid-cols-3">
-                    {showSizes?.map((size) => (
+                    {sizes?.map((size) => (
                       <RadioGroup.Option
-                        key={size.name}
-                        value={size}
+                        key={size.id}
+                        value={size.id}
                         className={({ active, checked }) =>
                           classNames(
-                            size.inStock
+                            size.id
                               ? "cursor-pointer focus:outline-none"
                               : "opacity-25 cursor-not-allowed",
                             active
@@ -258,7 +259,7 @@ export default function Example({ data, sanity, product }) {
                             "border rounded-md py-3 px-3 flex items-center justify-center text-sm font-medium uppercase sm:flex-1"
                           )
                         }
-                        disabled={!size.inStock}
+                        disabled={!size.id}
                       >
                         <RadioGroup.Label as="span">
                           {size.name}
@@ -378,16 +379,30 @@ export default function Example({ data, sanity, product }) {
 }
 
 export async function getServerSideProps({ params }) {
-  const merchant = await commerce.merchants.about()
-  const { data: categories } = await commerce.categories.list()
-  const { data: products } = await commerce.products.list()
-  let data = { merchant, categories, products }
-
   const { permalink } = params
+  let variants = []
 
   const product = await commerce.products.retrieve(permalink, {
     type: "permalink",
   })
+
+  const headers = {
+    "X-Authorization": process.env.NEXT_PUBLIC_COMMERCEJS_PUBLIC_KEY,
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  }
+
+  // Get Variant Groups
+  const url = new URL(
+    `https://api.chec.io/v1/products/${product.id}/variant_groups`
+  )
+
+  const resp = await fetch(url, {
+    method: "GET",
+    headers: headers,
+  })
+
+  variants = await resp.json()
 
   // Get Sanity Data
   const heads = await client.fetch(GET_SANITY_DATA)
@@ -399,12 +414,11 @@ export async function getServerSideProps({ params }) {
       (head) => head.id === process.env.NEXT_PUBLIC_HEAD_ID
     )
   }
-
   return {
     props: {
-      data,
       sanity: filtered[0],
       product,
+      variants: variants?.data,
     },
   }
 }

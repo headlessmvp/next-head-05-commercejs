@@ -84,8 +84,6 @@ export const Layout = ({ children }) => {
 
     useEffect(() => { }, categories)
 
-    console.log("CART: ", cart)
-
     return (
         <div className={styles.container}>
             <Head>
