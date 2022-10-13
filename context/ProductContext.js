@@ -1,7 +1,6 @@
 import { createContext, useEffect, useState } from "react"
 
 // Commerce Layer
-import { getSalesChannelToken } from "@commercelayer/js-auth"
 import commerce from "../lib/commerce"
 
 export const ProductContext = createContext()
@@ -11,7 +10,7 @@ export const ProductProvider = ({ children }) => {
   const [allProducts, setAllProducts] = useState([])
 
   const [subCategories, setSubCategories] = useState([])
-  const [allData, setAllData] = useState([])
+  // const [allData, setAllData] = useState([])
   const [sanityData, setSanityData] = useState([])
   const [categories, setCategories] = useState([])
   const [merchant, setMerchant] = useState({})
@@ -19,8 +18,8 @@ export const ProductProvider = ({ children }) => {
   const [filteredCategories, setFilteredCategories] = useState([])
 
   const [cart, setCart] = useState([])
-  const [token, setToken] = useState("")
-  const [auth, setAuth] = useState(null)
+  // const [token, setToken] = useState("")
+  // const [auth, setAuth] = useState(null)
   const compareSizes = [
     { name: "XXS" },
     { name: "XS" },
@@ -41,25 +40,25 @@ export const ProductProvider = ({ children }) => {
     setCart(filtered)
   }
 
-  const getToken = async () => {
-    const authResp = await getSalesChannelToken({
-      clientId: process.env.NEXT_PUBLIC_CL_SALES_CHANNEL_CLIENT_ID,
-      endpoint: process.env.NEXT_PUBLIC_CL_BASE_ENDPOINT,
-      scope: process.env.NEXT_PUBLIC_CL_MARKET_SCOPE,
-    })
-    setAuth(authResp)
+  // const getToken = async () => {
+  //   const authResp = await getSalesChannelToken({
+  //     clientId: process.env.NEXT_PUBLIC_CL_SALES_CHANNEL_CLIENT_ID,
+  //     endpoint: process.env.NEXT_PUBLIC_CL_BASE_ENDPOINT,
+  //     scope: process.env.NEXT_PUBLIC_CL_MARKET_SCOPE,
+  //   })
+  //   setAuth(authResp)
 
-    if (authResp?.accessToken) {
-      // console.log(
-      //   "Access token got: ",
-      //   authResp?.accessToken,
-      //   "expired ? : ",
-      //   authResp?.expired()
-      // )
-      setToken(authResp?.accessToken)
-      localStorage.setItem("token", JSON.stringify(authResp?.accessToken))
-    }
-  }
+  //   if (authResp?.accessToken) {
+  //     // console.log(
+  //     //   "Access token got: ",
+  //     //   authResp?.accessToken,
+  //     //   "expired ? : ",
+  //     //   authResp?.expired()
+  //     // )
+  //     setToken(authResp?.accessToken)
+  //     localStorage.setItem("token", JSON.stringify(authResp?.accessToken))
+  //   }
+  // }
 
   const getCart = async () => {
     const resp = await commerce.cart.retrieve()
@@ -87,23 +86,23 @@ export const ProductProvider = ({ children }) => {
     }
     setMerchant(merchant)
     setCategories(cats)
-    setAllData(products)
+    setAllProducts(products)
   }
 
   useEffect(() => {
     // console.log("Use effect context !")
     getData()
 
-    if (auth === null) {
-      getToken()
-    } else if (auth?.expired()) {
-      getToken()
-    } else if (localStorage.getItem("token")) {
-      // console.log("Token exists: ", localStorage.getItem("token"))
-      setToken(JSON.parse(localStorage.getItem("token")))
-    } else {
-      console.log("Token not in localstorage, nor expired, nor present")
-    }
+    // if (auth === null) {
+    //   getToken()
+    // } else if (auth?.expired()) {
+    //   getToken()
+    // } else if (localStorage.getItem("token")) {
+    //   // console.log("Token exists: ", localStorage.getItem("token"))
+    //   setToken(JSON.parse(localStorage.getItem("token")))
+    // } else {
+    //   console.log("Token not in localstorage, nor expired, nor present")
+    // }
   }, [])
 
   useEffect(() => {
@@ -119,9 +118,9 @@ export const ProductProvider = ({ children }) => {
         setCart,
         addToCart,
         removeFromCart,
-        allData,
-        setAllData,
-        token,
+        // allData,
+        // setAllData,
+        // token,
         subCategories,
         setSubCategories,
         compareSizes,

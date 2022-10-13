@@ -26,32 +26,30 @@ import commerce from "../../../lib/commerce"
 // Components
 import { Layout } from "../../../components/Layout"
 
+// Constants
+import { GET_SANITY_DATA } from "../../../constants/sanity"
+
 // Context
 import { ProductContext } from "../../../context/ProductContext"
 
-export default function Category({ data, sanity }) {
+export default function Category({ sanity, categories }) {
   const router = useRouter()
 
-  const { setAllData, allData, setSubCategories, setSanityData, sanityData } =
-    useContext(ProductContext)
+  const { setSanityData } = useContext(ProductContext)
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const [categoryData, setCategoryData] = useState({})
 
   useEffect(() => {
-    setAllData(data)
     setSanityData(sanity)
   }, [])
 
   useEffect(() => {
-    if (allData?.categories) {
-      let filtered = allData?.categories?.filter(
-        (item) => item.slug === router.query.id
-      )
+    if (categories) {
+      let filtered = categories?.filter((item) => item.slug === router.query.id)
       setCategoryData(...filtered)
     }
-  }, [allData])
+  }, [categories])
 
-  // console.log("CATEGORY: ", allData, categoryData)
   return (
     <Layout>
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -125,35 +123,8 @@ export async function getServerSideProps() {
   const { data: products } = await commerce.products.list()
   let data = { merchant, categories, products }
 
-  const query = `*[_type == "head"]{
-    id,
-    name,
-    country,
-    flag{
-      'url': asset->url
-    },
-    headline,
-    subHeading,
-    'images': images[]->{
-      name,
-      'url': images.asset->url
-    },
-    url,
-    bannerHeading,
-    bannerText,
-    saleText,
-    bannerImage{
-      'url': asset->url
-    },
-    
-    
-   
-    
-   
-}`
-
   // Get Sanity Data
-  const heads = await client.fetch(query)
+  const heads = await client.fetch(GET_SANITY_DATA)
 
   let filtered = {}
 
@@ -165,8 +136,8 @@ export async function getServerSideProps() {
 
   return {
     props: {
-      data,
       sanity: filtered[0],
+      categories,
     },
   }
 }
