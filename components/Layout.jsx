@@ -38,6 +38,9 @@ import {
 // Components
 import { Footer } from "./Footer"
 
+// Commerce
+import commerce from "../lib/commerce"
+
 const navigation = {
     categories: [
         {
@@ -179,11 +182,46 @@ export const Layout = ({ children }) => {
         categories,
         allProducts,
         filteredCategories,
-        cart
+        cart, setCart
     } = useContext(ProductContext)
     const [open, setOpen] = useState(false)
-
+    const [error, setError] = useState("")
     const [origin, setOrigin] = useState("http://localhost:3000")
+
+    // Functions
+    const removeFromCart = async (id) => {
+        try {
+            const resp = await commerce.cart.remove(id)
+            if (resp) {
+                setCart(resp)
+            }
+        } catch (error) {
+            setError(error)
+        }
+    }
+
+    const incrementQuantity = async (id, quantity) => {
+        try {
+
+            const resp = await commerce.cart.update(id, { quantity: quantity + 1 })
+            setCart(resp)
+        } catch (error) {
+            setError(error)
+        }
+    }
+
+    const decrementQuantity = async (id, quantity) => {
+        try {
+            if (quantity > 1) {
+                const resp = await commerce.cart.update(id, { quantity: quantity - 1 })
+                setCart(resp)
+            }
+
+        } catch (error) {
+            setError(error)
+        }
+    }
+
 
     useEffect(() => {
         setOrigin(location.origin)
@@ -191,7 +229,7 @@ export const Layout = ({ children }) => {
 
     useEffect(() => { }, categories)
 
-    // console.log(cart)
+    console.log("CART: ", cart)
 
     return (
         <CommerceLayer
@@ -765,7 +803,7 @@ export const Layout = ({ children }) => {
                                                                 className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
                                                                 aria-hidden="true"
                                                             />
-                                                            <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800"><LineItemsCount /></span>
+                                                            <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">{cart?.total_items}</span>
                                                             <span className="sr-only">items in cart, view bag</span>
                                                         </Popover.Button>
                                                         <Transition
@@ -782,32 +820,40 @@ export const Layout = ({ children }) => {
 
                                                                 <div className="mx-auto max-w-2xl px-4">
 
-                                                                    <ul role="list" className="divide-y divide-gray-200">
+                                                                    <ul role="list" className="flex flex-col divide-y divide-gray-200">
 
 
-                                                                        <LineItemsContainer>
-                                                                            <LineItem>
-                                                                                <div className="flex items-center py-6">
 
-                                                                                    <LineItemImage className="h-16 w-16 flex-none rounded-md border border-gray-200"
-                                                                                        width={50} />
-                                                                                    <div className="ml-4 flex-auto">
-                                                                                        <h3 className="font-medium text-gray-900">
-                                                                                            <LineItemName />
-                                                                                        </h3>
-                                                                                        <LineItemQuantity max={10} className="block mt-1 text-xs py-1" />
-                                                                                        {/* <Errors resource="lineItem" field="quantity" /> */}
-                                                                                        <LineItemAmount />
-                                                                                        <LineItemRemoveLink className='text-red-400 cursor-pointer text-xs block' />
+                                                                        {cart && cart?.line_items?.map(item => (
+                                                                            <div key={item?.id} className="flex items-center py-6">
+                                                                                <img src={item?.image?.url} alt={item?.name} className="h-16 w-16 flex-none rounded-md border border-gray-200"
+                                                                                    width={50} />
+                                                                                <div className="ml-4 flex-auto">
+                                                                                    <h3 className="font-medium text-gray-900">
+                                                                                        {item?.name}
+                                                                                    </h3>
+                                                                                    <div className="flex items-center">
+                                                                                        <button onClick={() => decrementQuantity(item?.id, item?.quantity)} className="border px-2">-</button>
+                                                                                        <p className="block mx-2 mt-1 text-sm py-1">{item?.quantity}</p>
+                                                                                        <button onClick={() => incrementQuantity(item?.id, item?.quantity)} className="border px-2">+</button>
                                                                                     </div>
+
+                                                                                    <p>{item?.price?.formatted_with_symbol}</p>
+                                                                                    {error !== "" && <p className="text-red-600">{error}</p>
+                                                                                    }
+
+                                                                                    <button onClick={() => removeFromCart(item?.id)} className='text-red-400 cursor-pointer text-xs block'>Remove</button>
                                                                                 </div>
-                                                                            </LineItem></LineItemsContainer>
+                                                                            </div>
+                                                                        ))}
+
+
 
 
                                                                     </ul>
 
 
-                                                                    <p className="text-base">Total: <LineItemsContainer><TotalAmount className="text-base" /></LineItemsContainer></p>
+                                                                    <p className="text-base">Total: {cart?.subtotal?.formatted_with_symbol}</p>
                                                                     <CheckoutLink
                                                                         type="submit"
                                                                         className="w-full rounded-md border border-transparent bg-indigo-600 mt-6 py-2 px-4 text-center text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50"

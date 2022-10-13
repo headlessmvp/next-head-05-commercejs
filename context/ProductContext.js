@@ -93,7 +93,6 @@ export const ProductProvider = ({ children }) => {
   useEffect(() => {
     // console.log("Use effect context !")
     getData()
-    getCart()
 
     if (auth === null) {
       getToken()
@@ -105,6 +104,10 @@ export const ProductProvider = ({ children }) => {
     } else {
       console.log("Token not in localstorage, nor expired, nor present")
     }
+  }, [])
+
+  useEffect(() => {
+    getCart()
   }, [])
 
   return (
