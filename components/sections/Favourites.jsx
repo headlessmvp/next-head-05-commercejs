@@ -14,7 +14,7 @@ import {
 
 
 export const Favourites = ({ favourites }) => {
-    console.log("FAV: ", favourites)
+    // console.log("FAV: ", favourites)
 
     return (
         <ItemContainer>

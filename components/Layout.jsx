@@ -191,7 +191,7 @@ export const Layout = ({ children }) => {
 
     useEffect(() => { }, categories)
 
-    console.log(cart)
+    // console.log(cart)
 
     return (
         <CommerceLayer
