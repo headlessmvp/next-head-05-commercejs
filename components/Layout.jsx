@@ -84,6 +84,7 @@ export const Layout = ({ children }) => {
 
     useEffect(() => { }, categories)
 
+
     return (
         <div className={styles.container}>
             <Head>

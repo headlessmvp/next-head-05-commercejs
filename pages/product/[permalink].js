@@ -45,7 +45,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
 
-export default function Example({ sanity, product, variants }) {
+export default function Example({ sanity, product, variant_groups, variants }) {
   const { setSanityData, setCart } = useContext(ProductContext)
 
   const [selectedColor, setSelectedColor] = useState()
@@ -60,13 +60,52 @@ export default function Example({ sanity, product, variants }) {
 
   // Functions
   const addToCart = async () => {
-    try {
-      let cart = await commerce.cart.add(product?.id)
-      if (cart) {
-        setCart(cart)
+    if (selectedColor && selectedSize) {
+      let variant_to_order_id = ""
+      variants?.map((variant) => {
+        console.log("ID: ", variant)
+
+        let count = 0
+
+        Object.keys(variant?.options)?.map((option) => {
+          console.log("OPTION : ", option, variant?.options[option])
+          if (
+            variant?.options[option] === selectedColor?.id ||
+            variant?.options[option] === selectedSize?.id
+          ) {
+            count += 1
+          }
+        })
+
+        console.log("COUNT", variant?.id, count)
+
+        if (count === 2) {
+          variant_to_order_id = variant?.id
+        }
+      })
+
+      if (variant_to_order_id !== "") {
+        try {
+          console.log(
+            "DATA: ",
+            product?.id,
+            product?.quantity,
+            variant_to_order_id
+          )
+          let cart = await commerce.cart.add(
+            product?.id,
+            product?.quantity,
+            variant_to_order_id
+          )
+          if (cart) {
+            setCart(cart)
+          }
+        } catch (error) {
+          setError(error?.message)
+        }
       }
-    } catch (error) {
-      setError(error)
+    } else {
+      setError("Please select Color & Sizes Both !")
     }
   }
 
@@ -75,9 +114,9 @@ export default function Example({ sanity, product, variants }) {
   }, [])
 
   useEffect(() => {
-    console.log("VARIANTS : ", variants)
-    if (variants?.length > 0) {
-      variants.map((variant) => {
+    console.log("VARIANT GROUPS : ", variant_groups)
+    if (variant_groups?.length > 0) {
+      variant_groups.map((variant) => {
         if (variant?.name === "Color") {
           setColors(variant?.options)
         } else if (variant?.name === "Size") {
@@ -85,7 +124,11 @@ export default function Example({ sanity, product, variants }) {
         }
       })
     }
-  }, variants)
+  }, variant_groups)
+
+  useEffect(() => {
+    console.log("VARIANTS: ", variants)
+  }, [variants])
 
   // useEffect(() => {
   //   if (product?.sizes) {
@@ -122,7 +165,7 @@ export default function Example({ sanity, product, variants }) {
     }
   }, [product])
 
-  console.log("VARIAAAA : ", sizes)
+  console.log("SELECTED : ", selectedColor, selectedSize)
   return (
     <Layout>
       <main className="mx-auto mt-8 max-w-2xl px-4 pb-16 sm:px-6 sm:pb-24 lg:max-w-7xl lg:px-8">
@@ -199,7 +242,7 @@ export default function Example({ sanity, product, variants }) {
                     {colors?.map((color) => (
                       <RadioGroup.Option
                         key={color.id}
-                        value={color.id}
+                        value={color}
                         className={({ active, checked }) =>
                           classNames(
                             color.id
@@ -244,7 +287,7 @@ export default function Example({ sanity, product, variants }) {
                     {sizes?.map((size) => (
                       <RadioGroup.Option
                         key={size.id}
-                        value={size.id}
+                        value={size}
                         className={({ active, checked }) =>
                           classNames(
                             size.id
@@ -379,12 +422,16 @@ export default function Example({ sanity, product, variants }) {
 }
 
 export async function getServerSideProps({ params }) {
+  // Get Product Data
   const { permalink } = params
-  let variants = []
 
   const product = await commerce.products.retrieve(permalink, {
     type: "permalink",
   })
+  // Get Product Data
+
+  // Get Variant Groups
+  let variant_groups = []
 
   const headers = {
     "X-Authorization": process.env.NEXT_PUBLIC_COMMERCEJS_PUBLIC_KEY,
@@ -392,7 +439,6 @@ export async function getServerSideProps({ params }) {
     "Content-Type": "application/json",
   }
 
-  // Get Variant Groups
   const url = new URL(
     `https://api.chec.io/v1/products/${product.id}/variant_groups`
   )
@@ -402,7 +448,16 @@ export async function getServerSideProps({ params }) {
     headers: headers,
   })
 
-  variants = await resp.json()
+  variant_groups = await resp.json()
+  // Get Variant Groups
+
+  // Get Variants
+  let variants = []
+  const res = await commerce.products.getVariants(product?.id)
+  if (res?.data) {
+    variants = res?.data
+  }
+  // Get Variants
 
   // Get Sanity Data
   const heads = await client.fetch(GET_SANITY_DATA)
@@ -414,11 +469,14 @@ export async function getServerSideProps({ params }) {
       (head) => head.id === process.env.NEXT_PUBLIC_HEAD_ID
     )
   }
+  // Get Sanity Data
+
   return {
     props: {
       sanity: filtered[0],
       product,
-      variants: variants?.data,
+      variant_groups: variant_groups?.data,
+      variants,
     },
   }
 }
