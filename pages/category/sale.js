@@ -4,10 +4,10 @@ import { Fragment, useState, useEffect, useContext } from "react"
 import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react"
 
 // Context
-import { ProductContext } from "../context/ProductContext"
+import { ProductContext } from "../../context/ProductContext"
 
 // Commerce Js
-import commerce from "../lib/commerce"
+import commerce from "../../lib/commerce"
 
 // Icons
 import { XMarkIcon } from "@heroicons/react/24/outline"
@@ -22,7 +22,7 @@ import {
 // Next
 import Link from "next/link"
 
-import { Layout } from "../components/Layout"
+import { Layout } from "../../components/Layout"
 
 const sortOptions = [
   { name: "Most Popular", href: "#", current: true },
@@ -36,7 +36,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
 
-export default function Favourites({ favourites }) {
+export default function Sale({ sale }) {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const { setAllData, allData, setSubCategories } = useContext(ProductContext)
   const [colors, setColors] = useState([])
@@ -46,8 +46,6 @@ export default function Favourites({ favourites }) {
   const [filteredProducts, setFilteredProducts] = useState([])
   const [products, setProducts] = useState([])
 
-  useEffect(() => {}, [favourites])
-  console.log(favourites)
   // useEffect(() => {
   //   setAllData(data)
   // }, [])
@@ -61,16 +59,16 @@ export default function Favourites({ favourites }) {
   // }, [allData])
 
   // useEffect(() => {
-  //   if (allData?.favourites?.length > 0) {
-  //     setProducts(allData?.favourites)
+  //   if (allData?.sale?.length > 0) {
+  //     setProducts(allData?.sale)
   //   }
-  // }, [allData?.favourites])
+  // }, [allData?.sale])
 
   // useEffect(() => {
   //   let tempColors = []
-  //   if (allData?.favourites) {
+  //   if (allData?.sale) {
   //     console.log("MAP")
-  //     allData?.favourites?.map((product) => {
+  //     allData?.sale?.map((product) => {
   //       tempColors.push(...product?.colors)
   //     })
 
@@ -84,12 +82,12 @@ export default function Favourites({ favourites }) {
   //     )
   //     setColors(colorsWithCheck)
   //   }
-  // }, [allData?.favourites])
+  // }, [allData?.sale])
 
   // useEffect(() => {
   //   let tempSizes = []
-  //   if (allData?.favourites) {
-  //     allData?.favourites?.map((product) => {
+  //   if (allData?.sale) {
+  //     allData?.sale?.map((product) => {
   //       tempSizes.push(...product?.sizes)
   //     })
 
@@ -103,7 +101,7 @@ export default function Favourites({ favourites }) {
   //     )
   //     setSizes(sizesWithCheck)
   //   }
-  // }, [allData?.favourites])
+  // }, [allData?.sale])
 
   // useEffect(() => {
   //   if (selectedColors?.length > 0) {
@@ -351,7 +349,7 @@ export default function Favourites({ favourites }) {
         <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-baseline justify-between border-b border-gray-200 pt-24 pb-6">
             <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-              Favourites
+              Sale
             </h1>
 
             <div className="flex items-center">
@@ -572,8 +570,8 @@ export default function Favourites({ favourites }) {
 
               {/* Product grid */}
               <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-3 lg:col-span-3 lg:gap-x-8">
-                {favourites &&
-                  favourites?.map((product) => (
+                {sale &&
+                  sale?.map((product) => (
                     <Link
                       key={product.sku}
                       href={`/product/${product?.permalink}`}
@@ -612,7 +610,7 @@ export async function getServerSideProps() {
 
   try {
     const { data } = await commerce.products.list({
-      category_slug: ["favourites"],
+      category_slug: ["sale"],
     })
 
     if (data) {
@@ -624,7 +622,7 @@ export async function getServerSideProps() {
 
   return {
     props: {
-      favourites: products,
+      sale: products,
     },
   }
 }

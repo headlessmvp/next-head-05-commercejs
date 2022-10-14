@@ -4,10 +4,10 @@ import { Fragment, useState, useEffect, useContext } from "react"
 import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react"
 
 // Context
-import { ProductContext } from "../context/ProductContext"
+import { ProductContext } from "../../context/ProductContext"
 
 // Commerce Js
-import commerce from "../lib/commerce"
+import commerce from "../../lib/commerce"
 
 // Icons
 import { XMarkIcon } from "@heroicons/react/24/outline"
@@ -22,7 +22,7 @@ import {
 // Next
 import Link from "next/link"
 
-import { Layout } from "../components/Layout"
+import { Layout } from "../../components/Layout"
 
 const sortOptions = [
   { name: "Most Popular", href: "#", current: true },
@@ -36,7 +36,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
 
-export default function Sale({ sale }) {
+export default function Collection({ collection }) {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
   const { setAllData, allData, setSubCategories } = useContext(ProductContext)
   const [colors, setColors] = useState([])
@@ -59,16 +59,16 @@ export default function Sale({ sale }) {
   // }, [allData])
 
   // useEffect(() => {
-  //   if (allData?.sale?.length > 0) {
-  //     setProducts(allData?.sale)
+  //   if (allData?.collection?.length > 0) {
+  //     setProducts(allData?.collection)
   //   }
-  // }, [allData?.sale])
+  // }, [allData?.collection])
 
   // useEffect(() => {
   //   let tempColors = []
-  //   if (allData?.sale) {
+  //   if (allData?.collection) {
   //     console.log("MAP")
-  //     allData?.sale?.map((product) => {
+  //     allData?.collection?.map((product) => {
   //       tempColors.push(...product?.colors)
   //     })
 
@@ -82,12 +82,12 @@ export default function Sale({ sale }) {
   //     )
   //     setColors(colorsWithCheck)
   //   }
-  // }, [allData?.sale])
+  // }, [allData?.collection])
 
   // useEffect(() => {
   //   let tempSizes = []
-  //   if (allData?.sale) {
-  //     allData?.sale?.map((product) => {
+  //   if (allData?.collection) {
+  //     allData?.collection?.map((product) => {
   //       tempSizes.push(...product?.sizes)
   //     })
 
@@ -101,7 +101,7 @@ export default function Sale({ sale }) {
   //     )
   //     setSizes(sizesWithCheck)
   //   }
-  // }, [allData?.sale])
+  // }, [allData?.collection])
 
   // useEffect(() => {
   //   if (selectedColors?.length > 0) {
@@ -349,7 +349,7 @@ export default function Sale({ sale }) {
         <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-baseline justify-between border-b border-gray-200 pt-24 pb-6">
             <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-              Sale
+              Collection
             </h1>
 
             <div className="flex items-center">
@@ -570,8 +570,8 @@ export default function Sale({ sale }) {
 
               {/* Product grid */}
               <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-3 lg:col-span-3 lg:gap-x-8">
-                {sale &&
-                  sale?.map((product) => (
+                {collection &&
+                  collection?.map((product) => (
                     <Link
                       key={product.sku}
                       href={`/product/${product?.permalink}`}
@@ -585,7 +585,7 @@ export default function Sale({ sale }) {
                           />
                         </div>
                         <h3 className="mt-4 font-medium text-gray-900">
-                          {product.name}
+                          {product?.name}
                         </h3>
                         {/* <p className="italic text-gray-500">
                             {product.caption}
@@ -610,7 +610,7 @@ export async function getServerSideProps() {
 
   try {
     const { data } = await commerce.products.list({
-      category_slug: ["sale"],
+      category_slug: ["collection"],
     })
 
     if (data) {
@@ -622,7 +622,7 @@ export async function getServerSideProps() {
 
   return {
     props: {
-      sale: products,
+      collection: products,
     },
   }
 }
