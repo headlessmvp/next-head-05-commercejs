@@ -18,4 +18,8 @@ export const GET_SANITY_DATA = `*[_type == "head"]{
     bannerImage{
       'url': asset->url
     },
+    'socials': socials[]->{
+      name,
+      url
+    }
 }`

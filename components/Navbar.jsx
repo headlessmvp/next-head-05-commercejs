@@ -42,7 +42,7 @@ export const Navbar = () => {
                             </Link>
                         </div>
                         <div className="md:hidden">
-                            <Link className="text-xl cursor-pointer" href={'/'}>Head 01</Link>
+                            <Link className="text-xl cursor-pointer" href={'/'}>Head 05</Link>
                         </div>
                         <div className="-my-2 flex -mr-2 md:hidden">
                             <ShoppingBagIcon
@@ -54,7 +54,7 @@ export const Navbar = () => {
                         </div>
 
                         <div className="hidden md:block">
-                            <Link className="text-2xl cursor-pointer" href={'/'}>Head 01</Link>
+                            <Link className="text-2xl cursor-pointer" href={'/'}>Head 05</Link>
                         </div>
                         <div className="hidden items-center justify-end md:flex md:flex-1 lg:w-0">
 
@@ -142,7 +142,7 @@ export const Navbar = () => {
                                         />
                                     </div>
                                     <div className="md:hidden">
-                                        <h2 className="text-xl">Head 01</h2>
+                                        <h2 className="text-xl">Head 05</h2>
                                     </div>
                                     <div className="-mr-2">
                                         <Popover.Button className="inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">

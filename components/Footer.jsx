@@ -5,39 +5,26 @@ import React, { useContext, useEffect } from "react"
 import { ProductContext } from "../context/ProductContext"
 
 const footerNavigation = {
-    shop: [
-        { name: "Bags", href: "#" },
-        { name: "Tees", href: "#" },
-        { name: "Objects", href: "#" },
-        { name: "Home Goods", href: "#" },
-        { name: "Accessories", href: "#" },
-    ],
+
     company: [
-        { name: "Who we are", href: "#" },
-        { name: "Sustainability", href: "#" },
-        { name: "Press", href: "#" },
-        { name: "Careers", href: "#" },
-        { name: "Terms & Conditions", href: "#" },
-        { name: "Privacy", href: "#" },
+        { name: "Who we are", href: "/company" },
+        { name: "Sustainability", href: "/company" },
+        { name: "Press", href: "/company" },
+        { name: "Careers", href: "/company" },
+
     ],
     account: [
-        { name: "Manage Account", href: "#" },
-        { name: "Returns & Exchanges", href: "#" },
-        { name: "Redeem a Gift Card", href: "#" },
+        { name: "Terms & Conditions", href: "/terms" },
+        { name: "Privacy", href: "/privacy" },
     ],
-    connect: [
-        { name: "Contact Us", href: "#" },
-        { name: "Twitter", href: "#" },
-        { name: "Instagram", href: "#" },
-        { name: "Pinterest", href: "#" },
-    ],
+
 }
 
 export const Footer = () => {
-    const { categories } = useContext(ProductContext)
+    const { categories, sanityData } = useContext(ProductContext)
 
     useEffect(() => { }, categories)
-
+    console.log("SANITY :", sanityData)
 
     return (
         <footer aria-labelledby="footer-heading" className="bg-white">
@@ -81,7 +68,7 @@ export const Footer = () => {
                         </div>
                         <div className="space-y-16 md:grid md:grid-cols-2 md:gap-8 md:space-y-0">
                             <div>
-                                <h3 className="text-sm font-medium text-gray-900">Account</h3>
+                                <h3 className="text-sm font-medium text-gray-900">Policies</h3>
                                 <ul role="list" className="mt-6 space-y-6">
                                     {footerNavigation.account.map((item) => (
                                         <li key={item.name} className="text-sm">
@@ -98,10 +85,10 @@ export const Footer = () => {
                             <div>
                                 <h3 className="text-sm font-medium text-gray-900">Connect</h3>
                                 <ul role="list" className="mt-6 space-y-6">
-                                    {footerNavigation.connect.map((item) => (
+                                    {sanityData?.socials?.map((item) => (
                                         <li key={item.name} className="text-sm">
                                             <a
-                                                href={item.href}
+                                                href={item.url}
                                                 className="text-gray-500 hover:text-gray-600"
                                             >
                                                 {item.name}
