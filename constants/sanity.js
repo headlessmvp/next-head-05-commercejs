@@ -21,5 +21,6 @@ export const GET_SANITY_DATA = `*[_type == "head"]{
     'socials': socials[]->{
       name,
       url
-    }
+    },
+    footerText
 }`
