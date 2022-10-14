@@ -24,7 +24,6 @@ export const Footer = () => {
     const { categories, sanityData } = useContext(ProductContext)
 
     useEffect(() => { }, categories)
-    console.log("SANITY :", sanityData)
 
     return (
         <footer aria-labelledby="footer-heading" className="bg-white">
