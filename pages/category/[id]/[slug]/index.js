@@ -63,11 +63,84 @@ export default function SubCategory({ category, products, sanity }) {
   const [selectedColors, setSelectedColors] = useState([])
   const [selectedSizes, setSelectedSizes] = useState([])
   const [filteredProducts, setFilteredProducts] = useState([])
+  const [variants, setVariants] = useState([])
+
+  // Functions
+  const setFilters = async () => {
+    // Get Variant Groups
+    let variant_groups_temp = []
+
+    const headers = {
+      "X-Authorization": process.env.NEXT_PUBLIC_COMMERCEJS_PUBLIC_KEY,
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    }
+
+    if (products.length > 0) {
+      let temp_sizes = []
+      let temp_colors = []
+
+      // console.log("BEFORE MAP")
+      // console.log("========================================")
+      let map = await Promise.all(
+        products?.map(async (product) => {
+          const url = new URL(
+            `https://api.chec.io/v1/products/${product.id}/variant_groups`
+          )
+
+          const resp = await fetch(url, {
+            method: "GET",
+            headers: headers,
+          })
+
+          let groups = await resp.json()
+          // console.log("GROUPS: ", groups)
+          variant_groups_temp.push(...groups?.data)
+          if (groups?.data) {
+            // TODO: Push Options to array
+
+            let size_options = groups?.data?.filter(
+              (group) => group?.name === "Size"
+            )
+            temp_sizes.push(...size_options[0]?.options)
+
+            let color_options = groups?.data?.filter(
+              (group) => group?.name === "Color"
+            )
+            temp_colors.push(...color_options[0]?.options)
+          }
+          // console.log("PUSHED: ", ...groups?.data)
+        })
+      )
+      // console.log("========================================")
+      // console.log("AFTER MAP: ")
+
+      // console.log("SIZE OPTIONS: ", temp_sizes)
+      // console.log("COLOR OPTIONS: ", temp_colors)
+
+      let uniqueSizesArray = [
+        ...new Map(temp_sizes.map((item) => [item["name"], item])).values(),
+      ]
+
+      let uniqueColorsArray = [
+        ...new Map(temp_colors.map((item) => [item["name"], item])).values(),
+      ]
+      // console.log("UNIQUE: ", uniqueSizesArray, uniqueColorsArray)
+      setColors(uniqueColorsArray)
+
+      setVariants(variant_groups_temp)
+    }
+  }
   // const [products, setProducts] = useState([])
 
   useEffect(() => {
     // setAllData(data)
     setSanityData(sanity)
+  }, [])
+
+  useEffect(() => {
+    setFilters()
+    // Get Variant Groups
   }, [])
 
   // useEffect(() => {
@@ -229,7 +302,8 @@ export default function SubCategory({ category, products, sanity }) {
   //   }
   // }, [sizes])
 
-  console.log("DATA: ", category, products)
+  console.log("COLORS: ", colors)
+
   return (
     <Layout>
       {/* Mobile filter dialog */}
@@ -474,7 +548,7 @@ export default function SubCategory({ category, products, sanity }) {
             {/* Filters */}
             <form className="hidden lg:block">
               {/* Colors */}
-              {subCategoryData && subCategoryData?.name && colors?.length && (
+              {colors?.length && (
                 <Disclosure as="div" className="border-b border-gray-200 py-6">
                   {({ open }) => (
                     <>
@@ -500,8 +574,8 @@ export default function SubCategory({ category, products, sanity }) {
                       </h3>
                       <Disclosure.Panel className="pt-6">
                         <div className="space-y-4">
-                          {colors?.map((color, index) => (
-                            <div key={color.code} className="flex items-center">
+                          {colors?.map((color) => (
+                            <div key={color.id} className="flex items-center">
                               <input
                                 id={`filter-${color.name}`}
                                 name={`${color.name}[]`}
@@ -612,7 +686,7 @@ export default function SubCategory({ category, products, sanity }) {
             <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 md:grid-cols-3 lg:col-span-3 lg:gap-x-8">
               {products &&
                 products?.map((product) => {
-                  console.log("PROD: ", product)
+                  // console.log("PROD: ", product)
                   return (
                     <Link
                       key={product.sku}
@@ -648,6 +722,7 @@ export default function SubCategory({ category, products, sanity }) {
 }
 
 export async function getServerSideProps({ params }) {
+  // Get Categories and Products
   const { slug } = params
   let products = []
 
@@ -666,6 +741,7 @@ export async function getServerSideProps({ params }) {
   } catch (error) {
     products = []
   }
+  // Get Categories and Products
 
   // Get Sanity Data
   const heads = await client.fetch(GET_SANITY_DATA)
@@ -677,6 +753,7 @@ export async function getServerSideProps({ params }) {
       (head) => head.id === process.env.NEXT_PUBLIC_HEAD_ID
     )
   }
+  // Get Sanity Data
 
   return {
     props: {
