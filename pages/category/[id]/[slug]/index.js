@@ -127,6 +127,7 @@ export default function SubCategory({ category, products, sanity }) {
       ]
       // console.log("UNIQUE: ", uniqueSizesArray, uniqueColorsArray)
       setColors(uniqueColorsArray)
+      setSizes(uniqueSizesArray)
 
       setVariants(variant_groups_temp)
     }
@@ -615,7 +616,7 @@ export default function SubCategory({ category, products, sanity }) {
               )}
 
               {/* Sizes */}
-              {subCategoryData && subCategoryData?.name && sizes?.length && (
+              {sizes?.length && (
                 <Disclosure as="div" className="border-b border-gray-200 py-6">
                   {({ open }) => (
                     <>
