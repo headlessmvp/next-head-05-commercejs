@@ -63,6 +63,7 @@ export default function SubCategory({ category, products, sanity }) {
   const [selectedColors, setSelectedColors] = useState([])
   const [selectedSizes, setSelectedSizes] = useState([])
   const [filteredProducts, setFilteredProducts] = useState([])
+  const [productsToShow, setProductsToShow] = useState(products)
   const [variants, setVariants] = useState([])
 
   // Functions
@@ -79,6 +80,7 @@ export default function SubCategory({ category, products, sanity }) {
     if (products.length > 0) {
       let temp_sizes = []
       let temp_colors = []
+      let temp_products = []
 
       // console.log("BEFORE MAP")
       // console.log("========================================")
@@ -108,15 +110,19 @@ export default function SubCategory({ category, products, sanity }) {
               (group) => group?.name === "Color"
             )
             temp_colors.push(...color_options[0]?.options)
+
+            temp_products.push({
+              ...product,
+              variants: {
+                colors: color_options[0]?.options,
+                sizes: size_options[0]?.options,
+              },
+            })
           }
-          // console.log("PUSHED: ", ...groups?.data)
         })
       )
       // console.log("========================================")
       // console.log("AFTER MAP: ")
-
-      // console.log("SIZE OPTIONS: ", temp_sizes)
-      // console.log("COLOR OPTIONS: ", temp_colors)
 
       let uniqueSizesArray = [
         ...new Map(temp_sizes.map((item) => [item["name"], item])).values(),
@@ -130,6 +136,7 @@ export default function SubCategory({ category, products, sanity }) {
       setSizes(uniqueSizesArray)
 
       setVariants(variant_groups_temp)
+      setProductsToShow(temp_products)
     }
   }
   // const [products, setProducts] = useState([])
@@ -144,167 +151,85 @@ export default function SubCategory({ category, products, sanity }) {
     // Get Variant Groups
   }, [])
 
-  // useEffect(() => {
-  //   if (allData?.categories) {
-  //     let subCatTemp = []
-  //     data?.categories?.map((category) => {
-  //       category?.children?.map((sub) => subCatTemp.push(sub))
-  //     })
-  //     setSubCategories(subCatTemp)
-  //   }
-  // }, [allData])
+  useEffect(() => {}, [productsToShow])
 
-  // useEffect(() => {
-  //   if (subCategories?.length) {
-  //     let tempProducts = []
+  useEffect(() => {
+    if (selectedColors?.length > 0) {
+      let tempProducts = []
 
-  //     let filteredSubCat = subCategories?.filter(
-  //       (item) => item.slug === router.query.slug
-  //     )
+      productsToShow?.map((product) => {
+        product?.variants?.colors?.map((color) => {
+          let filteredColor = selectedColors?.filter(
+            (item) => item.name === color?.name
+          )
 
-  //     // console.log("SUB CAT: ", filteredSubCat)
-  //     // console.log("PRODUCTS: ", allData?.products)
+          if (filteredColor[0]?.name) {
+            if (tempProducts?.length > 0) {
+              let filteredProduct = tempProducts?.filter(
+                (item) => item.name === product?.name
+              )
+              if (filteredProduct[0]?.name) {
+              } else {
+                tempProducts.push(product)
+              }
+            } else {
+              tempProducts.push(product)
+            }
+          }
+        })
+      })
 
-  //     let filtered
+      setFilteredProducts(tempProducts)
+    } else {
+      setFilteredProducts(productsToShow)
+    }
+  }, [selectedColors])
 
-  //     allData?.products?.map((prod) => {
-  //       console.log("MAPPING: ", prod, filteredSubCat)
-  //       filtered = prod?.categories?.filter(
-  //         (subCat) => subCat?.id === filteredSubCat[0]?.id
-  //       )
-  //       console.log("FILTERRR: ", filtered)
-  //       if (filtered[0]) {
-  //         tempProducts.push(prod)
-  //       }
-  //     })
-  //     // console.log("FILTERED: ", filtered)
-  //     console.log("TEMP PRODS: : ", tempProducts)
-  //     setProducts(tempProducts)
-  //     setSubCategoryData(...filteredSubCat)
-  //   }
-  // }, [subCategories])
+  useEffect(() => {
+    if (selectedSizes?.length > 0) {
+      let tempProducts = []
 
-  // useEffect(() => {
-  //   if (subCategoryData?.name) {
-  //     setProducts(subCategoryData?.products)
-  //   }
-  // }, [subCategoryData])
+      productsToShow?.map((product) => {
+        product?.variants?.sizes?.map((size) => {
+          let filteredSize = selectedSizes?.filter(
+            (item) => item.name === size?.name
+          )
 
-  // useEffect(() => {
-  //   let tempColors = []
-  //   if (subCategoryData?.name) {
-  //     subCategoryData?.products?.map((product) => {
-  //       tempColors.push(...product?.colors)
-  //     })
+          if (filteredSize[0]?.name) {
+            if (tempProducts?.length > 0) {
+              let filteredProduct = tempProducts?.filter(
+                (item) => item.name === product?.name
+              )
+              if (filteredProduct[0]?.name) {
+              } else {
+                tempProducts.push(product)
+              }
+            } else {
+              tempProducts.push(product)
+            }
+          }
+        })
+      })
 
-  //     const arrayUniqueByKey = [
-  //       ...new Map(tempColors.map((item) => [item["name"], item])).values(),
-  //     ]
+      setFilteredProducts(tempProducts)
+    } else {
+      setFilteredProducts(productsToShow)
+    }
+  }, [selectedSizes])
 
-  //     let colorsWithCheck = []
-  //     arrayUniqueByKey?.map((item) =>
-  //       colorsWithCheck.push({ ...item, checked: false })
-  //     )
-  //     setColors(colorsWithCheck)
-  //   }
-  // }, [subCategoryData])
+  useEffect(() => {
+    if (colors) {
+      let filtered = colors?.filter((item) => item?.checked)
+      setSelectedColors(filtered)
+    }
+  }, [colors])
 
-  // useEffect(() => {
-  //   let tempSizes = []
-  //   if (subCategoryData?.name) {
-  //     subCategoryData?.products?.map((product) => {
-  //       tempSizes.push(...product?.sizes)
-  //     })
-
-  //     const arrayUniqueByKey = [
-  //       ...new Map(tempSizes.map((item) => [item["name"], item])).values(),
-  //     ]
-
-  //     let sizesWithCheck = []
-  //     arrayUniqueByKey?.map((item) =>
-  //       sizesWithCheck.push({ ...item, checked: false })
-  //     )
-  //     setSizes(sizesWithCheck)
-  //   }
-  // }, [subCategoryData])
-
-  // useEffect(() => {
-  //   if (selectedColors?.length > 0) {
-  //     let tempProducts = []
-  //     products?.map((product) => {
-  //       product?.colors?.map((color) => {
-  //         let filteredColor = selectedColors?.filter(
-  //           (item) => item.name === color?.name
-  //         )
-  //         // console.log("FILTERED: COLOR: ", filteredColor, product)
-  //         if (filteredColor[0]?.name) {
-  //           if (tempProducts?.length > 0) {
-  //             let filteredProduct = tempProducts?.filter(
-  //               (item) => item.name === product?.name
-  //             )
-  //             if (filteredProduct[0]?.name) {
-  //             } else {
-  //               tempProducts.push(product)
-  //             }
-  //           } else {
-  //             tempProducts.push(product)
-  //           }
-  //         }
-  //       })
-  //     })
-
-  //     setFilteredProducts(tempProducts)
-  //   } else {
-  //     setFilteredProducts(products)
-  //   }
-  // }, [selectedColors])
-
-  // useEffect(() => {
-  //   if (selectedSizes?.length > 0) {
-  //     let tempProducts = []
-  //     products?.map((product) => {
-  //       product?.sizes?.map((size) => {
-  //         let filteredSize = selectedSizes?.filter(
-  //           (item) => item.name === size?.name
-  //         )
-  //         if (filteredSize[0]?.name) {
-  //           if (tempProducts?.length > 0) {
-  //             let filteredProduct = tempProducts?.filter(
-  //               (item) => item.name === product?.name
-  //             )
-  //             if (filteredProduct[0]?.name) {
-  //             } else {
-  //               tempProducts.push(product)
-  //             }
-  //           } else {
-  //             tempProducts.push(product)
-  //           }
-  //         }
-  //       })
-  //     })
-
-  //     setFilteredProducts(tempProducts)
-  //   } else {
-  //     setFilteredProducts(products)
-  //   }
-  // }, [selectedSizes])
-
-  // useEffect(() => {
-  //   if (colors) {
-  //     let filtered = colors?.filter((item) => item?.checked)
-  //     setSelectedColors(filtered)
-  //   }
-  // }, [colors])
-
-  // useEffect(() => {
-  //   if (sizes) {
-  //     let filtered = sizes?.filter((item) => item?.checked)
-  //     setSelectedSizes(filtered)
-  //   }
-  // }, [sizes])
-
-  console.log("COLORS: ", colors)
-
+  useEffect(() => {
+    if (sizes) {
+      let filtered = sizes?.filter((item) => item?.checked)
+      setSelectedSizes(filtered)
+    }
+  }, [sizes])
   return (
     <Layout>
       {/* Mobile filter dialog */}
@@ -685,8 +610,8 @@ export default function SubCategory({ category, products, sanity }) {
 
             {/* Product grid */}
             <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 md:grid-cols-3 lg:col-span-3 lg:gap-x-8">
-              {products &&
-                products?.map((product) => {
+              {filteredProducts &&
+                filteredProducts?.map((product) => {
                   // console.log("PROD: ", product)
                   return (
                     <Link
