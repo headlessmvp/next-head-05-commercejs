@@ -18,19 +18,19 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 
 // Sanity Client
-import { client } from "../../../lib/client"
+import { client } from "../../lib/client"
 
 // Commerce Js
-import commerce from "../../../lib/commerce"
+import commerce from "../../lib/commerce"
 
 // Components
-import { Layout } from "../../../components/Layout"
+import { Layout } from "../../components/Layout"
 
 // Constants
-import { GET_SANITY_DATA } from "../../../constants/sanity"
+import { GET_SANITY_DATA } from "../../constants/sanity"
 
 // Context
-import { ProductContext } from "../../../context/ProductContext"
+import { ProductContext } from "../../context/ProductContext"
 
 export default function Category({ sanity, categories }) {
   const router = useRouter()

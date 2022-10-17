@@ -30,7 +30,7 @@ export const Category = () => {
                 </div>
 
                 <div className="mt-6 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:grid-rows-2 sm:gap-x-6 lg:gap-8">
-                    {filteredCategories && filteredCategories[0] && <Link href={`/category/${filteredCategories[0]?.slug}`}><div className="group aspect-w-2 aspect-h-1 overflow-hidden rounded-lg sm:aspect-h-1 sm:aspect-w-1 sm:row-span-2">
+                    {filteredCategories && filteredCategories[0] && <Link href={`/${filteredCategories[0]?.slug}`}><div className="group aspect-w-2 aspect-h-1 overflow-hidden rounded-lg sm:aspect-h-1 sm:aspect-w-1 sm:row-span-2">
                         <img
                             src={filteredCategories[0]?.assets[0]?.url}
                             alt={filteredCategories[0]?.name}
@@ -52,7 +52,7 @@ export const Category = () => {
                         </div>
                     </div></Link>}
 
-                    {filteredCategories && filteredCategories[1] && <Link href={`/category/${filteredCategories[1]?.slug}`}><div className="group aspect-w-2 aspect-h-1 overflow-hidden rounded-lg sm:aspect-none sm:relative sm:h-full">
+                    {filteredCategories && filteredCategories[1] && <Link href={`/${filteredCategories[1]?.slug}`}><div className="group aspect-w-2 aspect-h-1 overflow-hidden rounded-lg sm:aspect-none sm:relative sm:h-full">
                         <img
                             src={filteredCategories[1]?.assets[0]?.url}
                             alt={filteredCategories[1]?.name}
@@ -78,7 +78,7 @@ export const Category = () => {
                     </div></Link>}
 
 
-                    {filteredCategories && filteredCategories[2] && <Link href={`/category/${filteredCategories[2]?.slug}`}><div className="group aspect-w-2 aspect-h-1 overflow-hidden rounded-lg sm:aspect-none sm:relative sm:h-full">
+                    {filteredCategories && filteredCategories[2] && <Link href={`/${filteredCategories[2]?.slug}`}><div className="group aspect-w-2 aspect-h-1 overflow-hidden rounded-lg sm:aspect-none sm:relative sm:h-full">
                         <img
                             src={filteredCategories[2]?.assets[0]?.url}
                             alt={filteredCategories[2]?.name}

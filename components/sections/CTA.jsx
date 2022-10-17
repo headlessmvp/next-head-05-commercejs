@@ -21,7 +21,7 @@ export const CTA = () => {
                                     {sanityData?.saleText}
                                 </h2>
                                 <div className="mt-6 text-base">
-                                    <Link href="/category/sale" >
+                                    <Link href="/sale" >
                                         <span className="font-semibold text-white cursor-pointer">Shop the sale
                                             <span aria-hidden="true"> &rarr;</span></span>
                                     </Link>

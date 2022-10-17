@@ -81,9 +81,7 @@ export const Layout = ({ children }) => {
     }
 
 
-
     useEffect(() => { }, categories)
-
 
     return (
         <div className={styles.container}>
@@ -346,9 +344,9 @@ export const Layout = ({ children }) => {
                                                                                             />
                                                                                         </div>
                                                                                         <Link
-                                                                                            href={`/subCategories/${item.slug}`}
+                                                                                            href={`/${filteredCategories[0]?.slug}/${item.slug}`}
                                                                                         >
-                                                                                            <span className="mt-6 block font-medium text-gray-900"
+                                                                                            <span className="mt-6 cursor-pointer block font-medium text-gray-900"
                                                                                             > <span
                                                                                                     className="absolute inset-0 z-10"
                                                                                                     aria-hidden="true"
@@ -399,12 +397,12 @@ export const Layout = ({ children }) => {
                                                                                                             key={item?.name}
                                                                                                             className="flex"
                                                                                                         >
-                                                                                                            <a
-                                                                                                                href={item?.reference}
-                                                                                                                className="hover:text-gray-800"
+                                                                                                            <Link
+                                                                                                                href={`/product/${item?.permalink}`}
                                                                                                             >
-                                                                                                                {item?.name}
-                                                                                                            </a>
+                                                                                                                <span className="hover:text-gray-800 underline cursor-pointer">                                                                                                                {item?.name}
+                                                                                                                </span>
+                                                                                                            </Link>
                                                                                                         </li>
                                                                                                     )
                                                                                                 )}
@@ -486,9 +484,9 @@ export const Layout = ({ children }) => {
                                                                                             />
                                                                                         </div>
                                                                                         <Link
-                                                                                            href={`/subCategories/${item.slug}`}
+                                                                                            href={`/${filteredCategories[1]?.slug}/${item.slug}`}
                                                                                         >
-                                                                                            <span className="mt-6 block font-medium text-gray-900"
+                                                                                            <span className="mt-6 cursor-pointer block font-medium text-gray-900"
                                                                                             > <span
                                                                                                     className="absolute inset-0 z-10"
                                                                                                     aria-hidden="true"
@@ -539,12 +537,12 @@ export const Layout = ({ children }) => {
                                                                                                             key={item?.name}
                                                                                                             className="flex"
                                                                                                         >
-                                                                                                            <a
-                                                                                                                href={item?.reference}
-                                                                                                                className="hover:text-gray-800"
+                                                                                                            <Link
+                                                                                                                href={`/product/${item?.permalink}`}
                                                                                                             >
-                                                                                                                {item?.name}
-                                                                                                            </a>
+                                                                                                                <span className="hover:text-gray-800 underline cursor-pointer">                                                                                                                {item?.name}
+                                                                                                                </span>
+                                                                                                            </Link>
                                                                                                         </li>
                                                                                                     )
                                                                                                 )}
@@ -618,7 +616,7 @@ export const Layout = ({ children }) => {
                                     </div>
 
                                     {/* Search */}
-                                    <div className="flex lg:ml-6">
+                                    {/* <div className="flex lg:ml-6">
                                         <a
                                             href="#"
                                             className="p-2 text-gray-400 hover:text-gray-500"
@@ -629,7 +627,7 @@ export const Layout = ({ children }) => {
                                                 aria-hidden="true"
                                             />
                                         </a>
-                                    </div>
+                                    </div> */}
 
                                     {/* Shopping Cart */}
                                     <Popover className="ml-4 flow-root text-sm lg:relative lg:ml-8 z-50">

@@ -7,10 +7,10 @@ import { ProductContext } from "../context/ProductContext"
 const footerNavigation = {
 
     company: [
-        { name: "Who we are", href: "/company" },
-        { name: "Sustainability", href: "/company" },
-        { name: "Press", href: "/company" },
-        { name: "Careers", href: "/company" },
+        { name: "Who we are", href: "/who-we-are" },
+        { name: "Sustainability", href: "/sustainability" },
+        { name: "Press", href: "/press" },
+        { name: "Careers", href: "/careers" },
 
     ],
     account: [
@@ -40,10 +40,11 @@ export const Footer = () => {
                                     {categories?.map((item) => (
                                         <li key={item.name} className="text-sm">
                                             <Link
-                                                href={`/category/${item.slug}`}
-                                                className="text-gray-500 hover:text-gray-600"
+                                                href={`/${item.slug}`}
                                             >
-                                                {item.name}
+                                                <span className="text-gray-500 hover:text-gray-600 underline cursor-pointer"
+                                                >                                                {item.name}
+                                                </span>
                                             </Link>
                                         </li>
                                     ))}
@@ -56,7 +57,7 @@ export const Footer = () => {
                                         <li key={item.name} className="text-sm">
                                             <a
                                                 href={item.href}
-                                                className="text-gray-500 hover:text-gray-600"
+                                                className="text-gray-500 hover:text-gray-600 underline"
                                             >
                                                 {item.name}
                                             </a>
@@ -73,7 +74,7 @@ export const Footer = () => {
                                         <li key={item.name} className="text-sm">
                                             <a
                                                 href={item.href}
-                                                className="text-gray-500 hover:text-gray-600"
+                                                className="text-gray-500 hover:text-gray-600 underline"
                                             >
                                                 {item.name}
                                             </a>
@@ -88,7 +89,7 @@ export const Footer = () => {
                                         <li key={item.name} className="text-sm">
                                             <a
                                                 href={item.url}
-                                                className="text-gray-500 hover:text-gray-600"
+                                                className="text-gray-500 hover:text-gray-600 underline"
                                             >
                                                 {item.name}
                                             </a>

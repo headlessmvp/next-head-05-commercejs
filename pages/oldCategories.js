@@ -87,10 +87,7 @@ export default function Categories({ data }) {
               {/* Product grid */}
               <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-3 lg:col-span-4 lg:gap-x-8">
                 {allData?.categories?.map((category) => (
-                  <Link
-                    key={category.name}
-                    href={`/category/${category?.slug}`}
-                  >
+                  <Link key={category.name} href={`/${category?.slug}`}>
                     <div className="group text-sm cursor-pointer">
                       <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-100 group-hover:opacity-75">
                         <img

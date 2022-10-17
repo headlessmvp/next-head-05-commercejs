@@ -14,7 +14,7 @@ export const Favourites = ({ favourites }) => {
                     <h2 id="favorites-heading" className="text-2xl font-bold tracking-tight text-gray-900">
                         Our Favorites
                     </h2>
-                    <Link href="/category/favourites" >
+                    <Link href="/favourites" >
                         <span className="hidden text-sm font-semibold text-indigo-600 hover:text-indigo-500 sm:block cursor-pointer"> Browse all favorites
                             <span aria-hidden="true"> &rarr;</span></span>
 
@@ -83,7 +83,7 @@ export const Favourites = ({ favourites }) => {
                 </div>
 
                 <div className="mt-6 sm:hidden">
-                    <Link href="/category/favourites" >
+                    <Link href="/favourites" >
                         <span className="block text-sm font-semibold text-indigo-600 hover:text-indigo-500">Browse all favorites
                             <span aria-hidden="true"> &rarr;</span></span>
                     </Link>

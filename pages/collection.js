@@ -4,10 +4,10 @@ import { Fragment, useState, useEffect, useContext } from "react"
 import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react"
 
 // Context
-import { ProductContext } from "../../context/ProductContext"
+import { ProductContext } from "../context/ProductContext"
 
 // Commerce Js
-import commerce from "../../lib/commerce"
+import commerce from "../lib/commerce"
 
 // Icons
 import { XMarkIcon } from "@heroicons/react/24/outline"
@@ -22,7 +22,7 @@ import {
 // Next
 import Link from "next/link"
 
-import { Layout } from "../../components/Layout"
+import { Layout } from "../components/Layout"
 
 const sortOptions = [
   { name: "Most Popular", href: "#", current: true },
@@ -36,147 +36,173 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ")
 }
 
-export default function Sale({ sale }) {
+export default function Collection({ products }) {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
-  const { setAllData, allData, setSubCategories } = useContext(ProductContext)
   const [colors, setColors] = useState([])
   const [sizes, setSizes] = useState([])
   const [selectedColors, setSelectedColors] = useState([])
   const [selectedSizes, setSelectedSizes] = useState([])
   const [filteredProducts, setFilteredProducts] = useState([])
-  const [products, setProducts] = useState([])
+  const [productsToShow, setProductsToShow] = useState(products)
+  const [variants, setVariants] = useState([])
 
-  // useEffect(() => {
-  //   setAllData(data)
-  // }, [])
+  // Functions
+  const setFilters = async () => {
+    // Get Variant Groups
+    let variant_groups_temp = []
 
-  // useEffect(() => {
-  //   let subCatTemp = []
-  //   data?.categories?.map((category) => {
-  //     category?.subCategories?.map((sub) => subCatTemp.push(sub))
-  //   })
-  //   setSubCategories(subCatTemp)
-  // }, [allData])
+    const headers = {
+      "X-Authorization": process.env.NEXT_PUBLIC_COMMERCEJS_PUBLIC_KEY,
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    }
 
-  // useEffect(() => {
-  //   if (allData?.sale?.length > 0) {
-  //     setProducts(allData?.sale)
-  //   }
-  // }, [allData?.sale])
+    if (products.length > 0) {
+      let temp_sizes = []
+      let temp_colors = []
+      let temp_products = []
 
-  // useEffect(() => {
-  //   let tempColors = []
-  //   if (allData?.sale) {
-  //     console.log("MAP")
-  //     allData?.sale?.map((product) => {
-  //       tempColors.push(...product?.colors)
-  //     })
+      // console.log("BEFORE MAP")
+      // console.log("========================================")
+      let map = await Promise.all(
+        products?.map(async (product) => {
+          const url = new URL(
+            `https://api.chec.io/v1/products/${product.id}/variant_groups`
+          )
 
-  //     const arrayUniqueByKey = [
-  //       ...new Map(tempColors.map((item) => [item["name"], item])).values(),
-  //     ]
+          const resp = await fetch(url, {
+            method: "GET",
+            headers: headers,
+          })
 
-  //     let colorsWithCheck = []
-  //     arrayUniqueByKey?.map((item) =>
-  //       colorsWithCheck.push({ ...item, checked: false })
-  //     )
-  //     setColors(colorsWithCheck)
-  //   }
-  // }, [allData?.sale])
+          let groups = await resp.json()
+          // console.log("GROUPS: ", groups)
+          variant_groups_temp.push(...groups?.data)
+          if (groups?.data) {
+            // TODO: Push Options to array
 
-  // useEffect(() => {
-  //   let tempSizes = []
-  //   if (allData?.sale) {
-  //     allData?.sale?.map((product) => {
-  //       tempSizes.push(...product?.sizes)
-  //     })
+            let size_options = groups?.data?.filter(
+              (group) => group?.name === "Size"
+            )
+            temp_sizes.push(...size_options[0]?.options)
 
-  //     const arrayUniqueByKey = [
-  //       ...new Map(tempSizes.map((item) => [item["name"], item])).values(),
-  //     ]
+            let color_options = groups?.data?.filter(
+              (group) => group?.name === "Color"
+            )
+            temp_colors.push(...color_options[0]?.options)
 
-  //     let sizesWithCheck = []
-  //     arrayUniqueByKey?.map((item) =>
-  //       sizesWithCheck.push({ ...item, checked: false })
-  //     )
-  //     setSizes(sizesWithCheck)
-  //   }
-  // }, [allData?.sale])
+            temp_products.push({
+              ...product,
+              variants: {
+                colors: color_options[0]?.options,
+                sizes: size_options[0]?.options,
+              },
+            })
+          }
+        })
+      )
+      // console.log("========================================")
+      // console.log("AFTER MAP: ")
 
-  // useEffect(() => {
-  //   if (selectedColors?.length > 0) {
-  //     let tempProducts = []
-  //     products?.map((product) => {
-  //       product?.colors?.map((color) => {
-  //         let filteredColor = selectedColors?.filter(
-  //           (item) => item.name === color?.name
-  //         )
-  //         // console.log("FILTERED: COLOR: ", filteredColor, product)
-  //         if (filteredColor[0]?.name) {
-  //           if (tempProducts?.length > 0) {
-  //             let filteredProduct = tempProducts?.filter(
-  //               (item) => item.name === product?.name
-  //             )
-  //             if (filteredProduct[0]?.name) {
-  //             } else {
-  //               tempProducts.push(product)
-  //             }
-  //           } else {
-  //             tempProducts.push(product)
-  //           }
-  //         }
-  //       })
-  //     })
+      let uniqueSizesArray = [
+        ...new Map(temp_sizes.map((item) => [item["name"], item])).values(),
+      ]
 
-  //     setFilteredProducts(tempProducts)
-  //   } else {
-  //     setFilteredProducts(products)
-  //   }
-  // }, [selectedColors])
+      let uniqueColorsArray = [
+        ...new Map(temp_colors.map((item) => [item["name"], item])).values(),
+      ]
+      // console.log("UNIQUE: ", uniqueSizesArray, uniqueColorsArray)
+      setColors(uniqueColorsArray)
+      setSizes(uniqueSizesArray)
 
-  // useEffect(() => {
-  //   if (selectedSizes?.length > 0) {
-  //     let tempProducts = []
-  //     products?.map((product) => {
-  //       product?.sizes?.map((size) => {
-  //         let filteredSize = selectedSizes?.filter(
-  //           (item) => item.name === size?.name
-  //         )
-  //         if (filteredSize[0]?.name) {
-  //           if (tempProducts?.length > 0) {
-  //             let filteredProduct = tempProducts?.filter(
-  //               (item) => item.name === product?.name
-  //             )
-  //             if (filteredProduct[0]?.name) {
-  //             } else {
-  //               tempProducts.push(product)
-  //             }
-  //           } else {
-  //             tempProducts.push(product)
-  //           }
-  //         }
-  //       })
-  //     })
+      setVariants(variant_groups_temp)
+      setProductsToShow(temp_products)
+    }
+  }
 
-  //     setFilteredProducts(tempProducts)
-  //   } else {
-  //     setFilteredProducts(products)
-  //   }
-  // }, [selectedSizes])
+  useEffect(() => {
+    setFilters()
+  }, [])
 
-  // useEffect(() => {
-  //   if (colors) {
-  //     let filtered = colors?.filter((item) => item?.checked)
-  //     setSelectedColors(filtered)
-  //   }
-  // }, [colors])
+  useEffect(() => {}, [productsToShow])
 
-  // useEffect(() => {
-  //   if (sizes) {
-  //     let filtered = sizes?.filter((item) => item?.checked)
-  //     setSelectedSizes(filtered)
-  //   }
-  // }, [sizes])
+  useEffect(() => {
+    if (selectedColors?.length > 0) {
+      let tempProducts = []
+
+      productsToShow?.map((product) => {
+        product?.variants?.colors?.map((color) => {
+          let filteredColor = selectedColors?.filter(
+            (item) => item.name === color?.name
+          )
+
+          if (filteredColor[0]?.name) {
+            if (tempProducts?.length > 0) {
+              let filteredProduct = tempProducts?.filter(
+                (item) => item.name === product?.name
+              )
+              if (filteredProduct[0]?.name) {
+              } else {
+                tempProducts.push(product)
+              }
+            } else {
+              tempProducts.push(product)
+            }
+          }
+        })
+      })
+
+      setFilteredProducts(tempProducts)
+    } else {
+      setFilteredProducts(productsToShow)
+    }
+  }, [selectedColors])
+
+  useEffect(() => {
+    if (selectedSizes?.length > 0) {
+      let tempProducts = []
+
+      productsToShow?.map((product) => {
+        product?.variants?.sizes?.map((size) => {
+          let filteredSize = selectedSizes?.filter(
+            (item) => item.name === size?.name
+          )
+
+          if (filteredSize[0]?.name) {
+            if (tempProducts?.length > 0) {
+              let filteredProduct = tempProducts?.filter(
+                (item) => item.name === product?.name
+              )
+              if (filteredProduct[0]?.name) {
+              } else {
+                tempProducts.push(product)
+              }
+            } else {
+              tempProducts.push(product)
+            }
+          }
+        })
+      })
+
+      setFilteredProducts(tempProducts)
+    } else {
+      setFilteredProducts(productsToShow)
+    }
+  }, [selectedSizes])
+
+  useEffect(() => {
+    if (colors) {
+      let filtered = colors?.filter((item) => item?.checked)
+      setSelectedColors(filtered)
+    }
+  }, [colors])
+
+  useEffect(() => {
+    if (sizes) {
+      let filtered = sizes?.filter((item) => item?.checked)
+      setSelectedSizes(filtered)
+    }
+  }, [sizes])
 
   return (
     <Layout>
@@ -349,7 +375,7 @@ export default function Sale({ sale }) {
         <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-baseline justify-between border-b border-gray-200 pt-24 pb-6">
             <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-              Sale
+              Collection
             </h1>
 
             <div className="flex items-center">
@@ -570,8 +596,8 @@ export default function Sale({ sale }) {
 
               {/* Product grid */}
               <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-3 lg:col-span-3 lg:gap-x-8">
-                {sale &&
-                  sale?.map((product) => (
+                {filteredProducts &&
+                  filteredProducts?.map((product) => (
                     <Link
                       key={product.sku}
                       href={`/product/${product?.permalink}`}
@@ -585,7 +611,7 @@ export default function Sale({ sale }) {
                           />
                         </div>
                         <h3 className="mt-4 font-medium text-gray-900">
-                          {product.name}
+                          {product?.name}
                         </h3>
                         {/* <p className="italic text-gray-500">
                             {product.caption}
@@ -610,7 +636,7 @@ export async function getServerSideProps() {
 
   try {
     const { data } = await commerce.products.list({
-      category_slug: ["sale"],
+      category_slug: ["collection"],
     })
 
     if (data) {
@@ -622,7 +648,7 @@ export async function getServerSideProps() {
 
   return {
     props: {
-      sale: products,
+      products,
     },
   }
 }

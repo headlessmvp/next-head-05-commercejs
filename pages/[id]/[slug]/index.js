@@ -4,7 +4,7 @@ import { Fragment, useState, useContext, useEffect } from "react"
 import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react"
 
 // Constants
-import { GET_SANITY_DATA } from "../../../../constants/sanity"
+import { GET_SANITY_DATA } from "../../../constants/sanity"
 
 // Heroicons
 import { XMarkIcon } from "@heroicons/react/24/outline"
@@ -21,16 +21,16 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 
 // Sanity Client
-import { client } from "../../../../lib/client"
+import { client } from "../../../lib/client"
 
 // Commerce Js
-import commerce from "../../../../lib/commerce"
+import commerce from "../../../lib/commerce"
 
 // Components
-import { Layout } from "../../../../components/Layout"
+import { Layout } from "../../../components/Layout"
 
 // Context
-import { ProductContext } from "../../../../context/ProductContext"
+import { ProductContext } from "../../../context/ProductContext"
 
 const sortOptions = [
   { name: "Most Popular", href: "#", current: true },

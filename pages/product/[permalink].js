@@ -6,9 +6,6 @@ import {
 } from "@heroicons/react/24/outline"
 import { Layout } from "../../components/Layout"
 
-// Next
-import { useRouter } from "next/router"
-
 // Constant
 import { GET_SANITY_DATA } from "../../constants/sanity"
 
@@ -56,19 +53,14 @@ export default function Example({ sanity, product, variant_groups, variants }) {
   const [colors, setColors] = useState([])
   const [sizes, setSizes] = useState([])
 
-  const router = useRouter()
-
   // Functions
   const addToCart = async () => {
     if (selectedColor && selectedSize) {
       let variant_to_order_id = ""
       variants?.map((variant) => {
-        console.log("ID: ", variant)
-
         let count = 0
 
         Object.keys(variant?.options)?.map((option) => {
-          console.log("OPTION : ", option, variant?.options[option])
           if (
             variant?.options[option] === selectedColor?.id ||
             variant?.options[option] === selectedSize?.id
@@ -77,8 +69,6 @@ export default function Example({ sanity, product, variant_groups, variants }) {
           }
         })
 
-        console.log("COUNT", variant?.id, count)
-
         if (count === 2) {
           variant_to_order_id = variant?.id
         }
@@ -86,12 +76,6 @@ export default function Example({ sanity, product, variant_groups, variants }) {
 
       if (variant_to_order_id !== "") {
         try {
-          console.log(
-            "DATA: ",
-            product?.id,
-            product?.quantity,
-            variant_to_order_id
-          )
           let cart = await commerce.cart.add(
             product?.id,
             product?.quantity,
@@ -114,7 +98,6 @@ export default function Example({ sanity, product, variant_groups, variants }) {
   }, [])
 
   useEffect(() => {
-    console.log("VARIANT GROUPS : ", variant_groups)
     if (variant_groups?.length > 0) {
       variant_groups.map((variant) => {
         if (variant?.name === "Color") {
@@ -126,26 +109,7 @@ export default function Example({ sanity, product, variant_groups, variants }) {
     }
   }, variant_groups)
 
-  useEffect(() => {
-    console.log("VARIANTS: ", variants)
-  }, [variants])
-
-  // useEffect(() => {
-  //   if (product?.sizes) {
-  //     let tempShowSizes = []
-  //     sizes?.map((size) => {
-  //       let filtered = product?.sizes?.filter(
-  //         (item) => item.name === size.name
-  //       )
-  //       if (filtered[0]) {
-  //         tempShowSizes.push({ name: size.name, inStock: true })
-  //       } else {
-  //         tempShowSizes.push({ name: size.name, inStock: false })
-  //       }
-  //     })
-  //     setShowSizes(tempShowSizes)
-  //   }
-  // }, [productDetails])
+  useEffect(() => {}, [variants])
 
   useEffect(() => {
     if (product?.sku) {
@@ -165,7 +129,6 @@ export default function Example({ sanity, product, variant_groups, variants }) {
     }
   }, [product])
 
-  console.log("SELECTED : ", selectedColor, selectedSize)
   return (
     <Layout>
       <main className="mx-auto mt-8 max-w-2xl px-4 pb-16 sm:px-6 sm:pb-24 lg:max-w-7xl lg:px-8">
